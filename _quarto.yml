@@ -5,7 +5,8 @@ book:
   title: "Introduction to R for Modellers"
   author: "Bo Gao"
   date: "8/22/2025"
-  issue-url: https://github.com/bg-intro-r/bg-intro-r.github.io
+  issue-url: https://bg-intro-r.github.io/
+  google-analytics: "G-265VMT9VML"
   repo-actions: issue
   
   appendices:
@@ -58,7 +59,7 @@ book:
     - references.qmd
 
   page-footer: 
-    left: "Copyright 2021 - 2025, Bo Gao" 
+    left: "Copyright 2021 - 2026, Bo Gao" 
     right: 
       - icon: github
         href: https://github.com/bogaotory
