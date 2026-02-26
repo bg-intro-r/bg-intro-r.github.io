@@ -67,11 +67,6 @@ book:
 
 bibliography: references.bib
 
-glossary:
-  path: glossary.yml
-  popup: click
-  show: true
-
 format:
   html:
     code-line-numbers: true
@@ -83,8 +78,6 @@ format:
     theme:
       - cosmo
       - brand
-  pdf:
-    documentclass: scrreprt
 
 highlight-style: github
 

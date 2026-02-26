@@ -197,7 +197,7 @@ df <- read.csv(file_to_read)
 ```
 :::
 
-## Next steps
+## The `.`
 
 `.` denotes the **current working directory** which refers to the project's root directory in the context of a coding project by default. Compared to `/`, `.` is context-specific. Meaning that `.` is interpreted differently under different projects. You will learn more on how this works in R from @sec-working-dir.
 
