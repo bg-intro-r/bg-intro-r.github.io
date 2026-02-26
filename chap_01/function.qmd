@@ -1,0 +1,298 @@
+---
+title: "Function"
+author: "Bo Gao"
+date: "`r Sys.Date()`"
+reference-location: margin
+---
+
+Noticed how `xor` is written differently to the other operators? R is much more than a simple calculator and the number of operations offered by R far exceeds the number of readable symbols available on the keyboard, and so, most operations are called as functions (see [R built-in numeric functions] for a few more functions, e.g. `abs`, `sqrt`, `sin`).
+
+To the R interpreter, `xor(x, y)` issues one call to a function named `xor` with two arguments `x`, and `y`. The same applies to all the other operators.
+<span class="quote-emph">**All of the operators we studied so far are functions.**</span>
+
+```{r eval = FALSE}
+`+`(2, 3)           # is equivalent to 2 + 3
+`^`(2, 3)           # is equivalent to 2 ^ 3
+`>`(2, 3)           # is equivalent to 2 > 3
+`xor`(TRUE, FALSE)  # is equivalent to xor(TRUE, FALSE)
++(2, 3)           # Does this work?
+```
+
+> In R, a quick way to find out more about a function is to prefix `?` to the name of the function. And yes, you guessed it, `?` itself is a function too.
+
+Try these:
+```{r eval = FALSE}
+?xor
+?`+`
+?`?`
+```
+
+**Recommended readings**:
+
+- [Chapter 6, Functions, Hadley](https://adv-r.hadley.nz/functions.html)
+
+## Syntactic names
+
+Noticed how we had to wrap symbols such as `+` and `>` in backticks "\`", and without them, expressions such as `+(2, 3)` evaluates to an error.
+At the same time, `xor` works just fine without the backtick wrapper. In both cases `+` and `xor` are both names of functions, but `+` had to be wrapped within backticks because the symbol `+` is not a **syntactic name** whereas `xor` is a perfectly fine syntactic name.
+
+> In R, a syntactic name must only consist of letters, digits, `.`, and `_`, and it cannot begin with `_` or a digit. Reserved words such as `TRUE`, `FALSE`, and `function` (`?Reserved`) also can't be used as syntactic names.
+
+In order to use a non-syntactic name to identify things in R, you have to wrap it between backticks.
+
+## **Nearly everything that happens in R results from a function call**
+
+A function can be as simple as `xor` providing the result of one operation, but more often multiple operations are combined and organised in a specific way and encapsulated in a custom-named function. These functions are then combined to make a script that forms a piece of **computer program**.
+
+> <span class="quote-emph">**Nearly everything that happens in R results from a function call.**</span> Therefore, basic programming centers on creating and refining functions. - John Chambers
+
+Functions in R are **first class objects**.
+
+See all functions in the base package with `ls("package:base")`.
+
+## Write your own function
+
+Write a function **IsEven** which takes a single numerical value as input and returns TRUE if and only if that given value is even.
+
+```{r eval = FALSE}
+IsEven <- function (x) {
+  return(x %% 2 == 0)
+}
+IsEven(10)
+IsEven(9)
+
+IsEven # type the function's name to see its implementation
+`xor`
+`+`
+```
+![Illustration: Syntax of a function](img/1_IsEven.png)
+
+Note that some functions are designed to encapsulate a group of statements rather than work out a value. In such case, a `return` statement is not necessary. Otherwise, an explicit return is required. Note that this is not the same as the implicit return we describe in [Avoid implicit return].
+
+## Avoid implicit return
+
+> Don't do this: When a return statements is missing from the end of the function. R assumes that the evaluation of the last statement of the function is the return value. This is referred to as *implicit* return. This makes the code difficult to read, and should be avoided. The good practice is to always **explicit** return (i.e. use `return()` explicitly at the endo of the function)
+
+Throughout the module, we will give note to bad programming practices which should be avoid. For a more comprehensive read on good programming styles in R, we follow these two guides:
+
+- [Google's R style guide](https://google.github.io/styleguide/Rguide.html)
+- [The tidyverse style guide](https://style.tidyverse.org/)
+
+Where contrasting opinions are present, we follow Google's R Style Guide over that of tidyverse.
+
+<!-- # Functions II -->
+
+## Components
+An R function has three parts
+
+ - `formals`, the list of arguments used by the function
+ - `body`, the implementation of the function logic
+ - `environment`, the environment that encapsulate the function
+
+> Except the primitive and internal functions that are written in C. e.g. `abs`, `sum`, `+`, etc.
+
+```{r eval = FALSE}
+formals(xor)
+body(xor)
+environment(xor)
+```
+
+Also, user-defined functions:
+```{r eval = FALSE}
+Bmi <- function(weight, height) {
+  return(weight / height^2)
+}
+formals(Bmi)
+body(Bmi)
+environment(Bmi)
+```
+
+## Formals
+
+Defining a function in R is similar to defining a variable. A function object defined by the `function` function is assigned a name by the `<-` operator.
+
+The formals / signature / interface of the function is defined by the list of argument it takes.
+
+```{r eval = FALSE}
+Bmi <- function(weight, height) {
+  return(weight / height^2)
+}
+
+# arguments can be of any order when they are named
+Bmi(weight = 90, height = 1.75)
+Bmi(height = 1.75, weight = 90)
+# otherwise the order is implicitly implied
+Bmi(90, 1.75)
+```
+
+### Default values
+
+```{r eval = FALSE}
+# an argument may have a default value
+Bmi <- function(weight = 90, height = 1.75) {
+  return(weight / height^2)
+}
+Bmi(90)
+Bmi(70)
+identical(
+  Bmi(, 1.75),
+  Bmi(height = 1.75)
+)
+```
+
+### `...`
+
+The construct is referred to as "ellipsis" / "dot-dot-dot".
+
+When you want to pass arguments only used in a nested function:
+```{r eval = FALSE}
+f1 <- function(x, y) {
+  print(paste0("f1: x=", x, ", y=", y))
+}
+f2 <- function(z, ...) {
+  print(paste0("f2: z=", z))
+  f1(...)
+}
+f2(z = 55, x = 10, y = 9)
+```
+
+Look at how the function `save` uses ellipsis:
+```{r evel = FALSE}
+save
+```
+
+## Scoping
+
+```{r eval = FALSE}
+x <- 1
+y <- 2
+f <- function() {
+  x <- 10 # 1. Overwrites the x outside the function
+  print(paste0("f: 1. x=", x, ", y=", y)) # 2. Look for y from one level up
+  x <- 30
+  y <- 20
+  print(paste0("f: 2. x=", x, ", y=", y)) # 3. The closest y is used
+}
+f()
+f() # 4. calling second time gives the same result
+y <- 3
+f() # 5. y updated just before the call
+```
+
+## Lazy evaluation
+
+- An argument is not evaluated until its evaluation is needed.
+- [Short-circuit evaluation](https://en.wikipedia.org/wiki/Short-circuit_evaluation)
+
+```{r eval = FALSE}
+TRUE || stop("ERROR")
+
+f <- function(x) {
+  print(paste0("f called"))
+  return(x)
+}
+
+FALSE && f()
+TRUE && f(FALSE) && f()
+TRUE && f(TRUE) && f()
+```
+
+[The R language definition: Promise objects](http://colinfay.me/r-language-definition/objects.html#promise-objects):
+
+> Promise objects are part of R’s lazy evaluation mechanism. They contain three slots: a value, an expression, and an environment. When a function is called the arguments are matched and then each of the formal arguments is bound to a promise. The expression that was given for that formal argument and a pointer to the environment the function was called from are stored in the promise.
+
+> Until that argument is accessed there is no value associated with the promise. When the argument is accessed, the stored expression is evaluated in the stored environment, and the result is returned. The result is also saved by the promise. The substitute function will extract the content of the expression slot. This allows the programmer to access either the value or the expression associated with the promise.
+
+
+```{r eval = FALSE}
+f <- function(x = 1, y = x * 10) {
+  x <- x*3
+  return(c(x, y))
+}
+f()
+```
+
+ - A promise is only evaluated once
+
+```{r eval = FALSE}
+f1 <- function(x) {
+  print("f1 called")
+  return(x + 10)
+}
+
+f2 <- function(y) {
+  return(c(y, y))
+}
+
+f3 <- function(y) {
+  return(c(f1(y), f1(y))) # 2 promises
+}
+
+f2(f1(100)) # 1 promise
+f3(100)
+```
+
+Take a look at the `save` function again to see how it prompts an error when no file name is specified by the user.
+
+```
+?save
+```
+
+## Base R functions
+
+### Math functions
+
+```{r eval = FALSE}
+abs(-1)    # absolute value
+sqrt(2)    # squre root
+
+pi         # the number pi
+
+round(pi, digit = 3) # ?round
+ceiling(pi)
+floor(pi)
+trunc(pi)
+signif(pi)
+
+cos(pi/3)   # ?trig
+sin(pi/6)
+tan(pi/4)
+
+exp(pi)     # ?log
+log(1)
+log(exp(1))
+log10(10)
+
+choose(n = 10, k = 2)
+factorial(4)
+```
+
+### String functions
+
+```{r eval = FALSE}
+# concatenation
+paste("a", "b", "c")
+paste("a", "b", "c", sep = "-")
+paste0("a", "b", "c")
+
+# sub string
+substr("abcdefg", start = 2, stop = 4)
+
+# pattern matching
+grep("cd", c("iii", "abcde", "ooo"), fixed = TRUE)
+grepl("cd", c("iii", "abcde", "ooo"), fixed = TRUE)
+
+# substitution
+gsub("[c,o]", "-", c("iii", "abcde", "ooo"))
+
+# case
+tolower("ApPle")
+toupper("ApPle")
+
+# number of characters
+nchar("apple")
+```
+
+## Exercises {-}
+
+See @sec-exercises-1 for exercises on writing simple functions.

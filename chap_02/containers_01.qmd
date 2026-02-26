@@ -1,0 +1,1118 @@
+# Homogeneous Types
+
+If you have experiences in programming languages such as C/C++, Java, you are probably wondering why we have not said anything about primitive types such as `int`, `float`, and `boolean` yet? And how are we going to introduce data structures, such as vectors, without defining scalar types first?
+
+ - First of all, as you might have noticed, R is dynamically-typed (see [Typing systems]), which is why we are able to use R as a calculator without specifying the types of the values we give to R in our code.
+ - More importantly, and dramatically, as we will show in this session, **all primitive types in R are vectors**. This is a design choice that makes R different from many other programming languages, and has profound implications on how we write code in R.
+
+**Recommended readings:**
+
+- [Chapter 3, Vectors, Advanced R, Hadley](https://adv-r.hadley.nz/vectors-chap.html)
+- [R Internals](https://cran.r-project.org/doc/manuals/r-release/R-ints.html)
+- [R Language Definition](https://cran.r-project.org/doc/manuals/r-release/R-lang.html)
+- [Chapter 9, Functionals, Advanced R, Hadley](https://adv-r.hadley.nz/functionals.html)
+
+
+## Overview
+ 
+ - Atomic vectors are the primitive types in R
+ - Data of different types may be coerced into another type
+ - Attributes add context to atomic vectors
+ - Matrices are atomic vectors with `dim` attribute
+ - Class is attribute of atomic vectors
+ - All values in vectors are of the same type
+ - Lists are collections of vectors of varying type and length
+ 
+![Diagram: data structures in R](img/4_data_structures.png)
+
+## Atomic vectors
+
+The most basic data type in R is the **atomic vector**, also referred to as the basic vector or simply as vector. Atomic vector is the primary data type of R. This is different from other programming languages such as C and Java who has scalar types. (See [SEXP] if you want to dig deeper under the hood of R.)
+
+> <span class="quote-emph">**There are no 0-dimensional types in R.**</span> Individual numbers or strings, which appear to be scalars, are vectors of length one.
+
+See [Scalar and vectors] if you are not sure of these terms.
+
+```{r eval = FALSE}
+a <- 1.0     # a appears to be a scalar
+is.vector(a) # a is a vector of length 1
+```
+
+```{r eval = FALSE}
+"abc"[1]   # first element of a character vector of length 1
+100[1]   # first element of a numerical vector of length 1
+```
+
+## `c` function
+
+Function `c` combines values to form a new (atomic) vector.
+
+```{r}
+a <- c(1, 2, 3)
+b <- c(a, 4, 5, 6)
+c <- c(a, 10, 10, a)
+d <- c(c(11, 12, 13), 10, a)
+d
+```
+
+
+> Have you noticed the `[1]` which is always at the beginning of the output? Have you asked yourself what it is for? This next example will give you the answer.
+
+Let's practice using the `for` loop
+```{r eval = FALSE}
+b <- 1 
+for (ii in 1:100) {
+  b <- c(b, ii)
+}
+b
+```
+
+
+When only one element is given to `c`, the resulting value is the same as if a scalar value is given:
+```{r eval = FALSE}
+a <- c(1)
+b <- 1
+identical(a, b)
+```
+
+When no inputs are given, `c()` returns `NULL` (see [Examples of missing values]).
+```{r eval = FALSE}
+a <- c()
+is.null(a)
+```
+
+The length of the vector can be obtained **and set** by the `length` function:
+```{r eval = FALSE}
+a <- c(1, 2, 3)
+d <- c(c(11, 12, 13), 10, a)
+length(d)
+print(d)
+length(d) <- length(d) - 3 # remove the last 3 elements from the vector
+print(d)
+```
+
+
+
+## Base types
+
+
+As the primary data structure of R, an atomic vector is an ordered collection of values of the **same** kind (as opposed to [Lists]). There are 4 commonly used atomic vector types in R:
+
+
+- **double**, the *default* type R use to store (real) numeric values. `10`, `3.6`, `2.67e5`
+- **integer**, whole numbers. `10L, 2.67e5L, from:to`
+- **character**, texts `"abc", "column_a"`
+- **logical**, `TRUE`, `FALSE`
+
+
+```{r eval = FALSE}
+d <- 2.9
+i <- 4L
+s <- "abc"
+b <- TRUE
+typeof(d) # typeof prints the type of an object. Type `?typeof` for documentation
+typeof(i)
+typeof(s)
+typeof(b)
+```
+
+
+### `double`
+
+
+> `?double` - R has no single precision data type. All real numbers are stored in double precision format.
+
+```{r eval = FALSE}
+x <- 10   # double is the default numeric type
+typeof(x)
+```
+
+Numeric [literals](https://en.wikipedia.org/wiki/Literal_(computer_programming)) can be written in decimal, scientific, or hexadecimal formats:
+
+**Decimal format**
+```{r eval = FALSE}
+x <- 2.9  # decimal format
+typeof(x)
+typeof(10)
+typeof(10.0)
+```
+**Scientific notation format**
+```{r eval = FALSE}
+x <- 7.82e5 # scientific notation
+x
+x <- 7.82e-10
+x # printed in scientific notation
+options(scipen = 999) # switch off printing in scientific notation
+x # see how all the zeros are now printed, how many zeros do you see behind the decimal point?
+options(scipen = 0) # reset scipen to default
+x # printed in scientific notation again
+```
+
+**Hexadecimal format**
+
+```{r eval = FALSE}
+x <- 0xb # 0x - hexadecimal numeric constants (base 16)
+x
+print(0xA) # not case sensitive
+```
+
+[Why are hexadecimal numbers prefixed with 0x?](https://stackoverflow.com/questions/2670639/why-are-hexadecimal-numbers-prefixed-with-0x)
+
+### `integer`
+
+> `?integer` - integer (vectors) exist so that data can be passed to C or Fortran code which expects them, and so that **small** integer data can be represented exactly and compactly. 
+Note that <span class="quote-emph"> current implementations of R use 32-bit integers for integer vectors </span>, so the range of representable integers is restricted to about +/-2*10^9 (2 billion)
+
+```{r eval = FALSE}
+x <- 5L # add L to the end to use integer
+x
+typeof(x)
+x <- 3.9e3L # also works with scientific notation
+x
+typeof(x)
+x <- 1:3 # > ?`:`
+x # a sequence of integers from 1 to 3
+typeof(x)
+length(x)
+.Machine$integer.max # biggest integer that can be stored
+2^31
+```
+
+For more on the limitation of integers in R: [R in a 64 bit world](https://www.r-bloggers.com/2015/06/r-in-a-64-bit-world/)
+
+
+### `character`
+
+A character vector is for storing text-based values. Each element of the vector is a string of characters.
+
+```{r eval = FALSE}
+s <- "R"      # s is a character vector of length 1
+s <- "Rrrr"   # s is a character vector of length 1
+s <- c("R", "is great", "!") # s is a character vector of length 3
+s <- "\"abc"
+print(s)
+cat(s)
+cat("\n")
+nchar(s)      # number of characters
+typeof(s)
+s <- '"abc'
+s
+s <- "'abc"
+s
+```
+
+- Concatenate, sub-string, substitution
+
+```{r eval = FALSE}
+paste("R", "is great", "!")
+paste0("R", "is great", "!")
+```
+
+```{r eval = FALSE}
+substr("Mary has a little lamb.", start = 3, stop = 12)
+sub("little", "big", "Mary has a little lamb.") 
+```
+
+
+### `logical`
+
+```{r eval = FALSE}
+l1 <- c(TRUE, FALSE, FALSE)
+l2 <- c(T, F, F)
+identical(l1, l2)
+
+sum(c(T, F, F, T, T))
+```
+
+### Other types
+
+Other less commonly used data types also exist in R:
+
+- **complex**, complex numbers in the form "a+bi", `3+8i`
+- **raw**, raw bytes
+
+```{r eval = FALSE}
+a <- raw(3) # a raw vector of length 3
+a           # 00 00 00
+a[1] <- as.raw(11) # 0b 00 00 hexadecimal (base 16)
+a[2] <- as.raw(16)
+a
+```
+
+## Type test
+
+To get a logical value to indicate whether the value is of the desired type, we call on the following functions:
+```{r eval = FALSE}
+a <- c(1L, 3, 10L)
+is.atomic(a)
+is.logical(a)
+is.integer(a)
+is.double(a)
+is.character(a)
+is.numeric(a)
+```
+
+
+
+## Coercion
+
+- Implicit coercion (type promotion)
+- Explicit coercion
+
+### Implicit coercion
+
+Recall that all elements of a vector must share the same type. What happens when you put different types in the same `c` function?
+```{r eval = FALSE}
+v <- c(TRUE, 100L) # combine logical value with integer
+v
+typeof(v)
+v <- c(100, 100L) # combine double with integer
+typeof(v)
+v <- c(TRUE, "abc") # combine logical value with character string
+typeof(v)
+```
+
+We can see that values from the more strict type is always coerced to the less strict type. For instance, when `TRUE` and `100L` are combined, the logical `TRUE` is coerced to the integer value of `1L`. This is because the integer type in this instance is able to present `TRUE` in its entirety, whereas the opposite is not possible. Following the same logic, we can rank the four atomic types as illustrated:
+
+![Coercion ranks of atomic types](img/3_coercion.png)
+
+Values of lower ranked type is coerced to the higher ranked type to preserve its value. This behaviour is similar to the [implicit type casting](https://en.cppreference.com/w/c/language/conversion) in other languages such as C.
+
+Implicit coercion also happens in arithmetic operations
+```{r eval = FALSE}
+typeof(100L * 3.875)
+typeof(15L + 15L * FALSE)
+```
+
+### Explicit coercion
+
+Sometimes, we want to explicitly change the type of a vector from one type to another:
+
+```{r eval = FALSE}
+as.character(54L)
+as.logical(6.5)
+as.logical(-6.5)
+as.logical(0)
+as.integer("100.10")
+as.integer(100.1)
+as.character(NaN)
+as.double("481.9")
+as.double("abc")
+```
+
+`double` and `integer` are referred to as **numeric** types in R.
+
+```{r eval = FALSE}
+typeof(as.numeric("101"))
+typeof(as.numeric("101L"))
+```
+
+
+
+## Built-in constants
+
+R has a few built-in constants:
+
+```{r eval = FALSE}
+LETTERS
+letters
+month.abb
+month.name
+pi
+typeof(pi)
+```
+
+The names of these constants are not reserved words (see `?reserved`) in R. The user can overwrite their values.
+
+```{r eval = FALSE}
+pi <- 3
+```
+
+## `Inf` and `NaN`
+
+Both `Inf` and `NaN` are of type **double**, both are reserved words (see `?reserved`) in R.
+
+```{r eval = FALSE}
+4 / 0             # infinity
+-4 / 0            # negative infinity
+typeof(Inf)
+is.infinite(4)
+is.infinite(4 / 0)
+is.numeric(Inf)
+10 < Inf
+10 < -Inf
+
+0 / 0             # NaN, not a number
+Inf - Inf         # NaN
+is.nan(4)
+is.nan(NaN)
+typeof(NaN)
+```
+
+
+- Non-measurable vs Not-measured
+- "You know it, I know it, everyone knows it." - `Inf`, `NaN`
+- "I don't know"
+  - `NA` - (going crazy face), "I don't know why I don't know."
+  - `NULL` - (calm face), "I know that I don't know."
+
+
+
+## `NA` and `NULL`
+
+In R, `NA` and `NULL` are the two keywords that are used in relation to the null problem (See [null in computers]).
+
+- Both `NA` and `NULL` are used to represent nothing ( **missing or undefined values**).
+- `NA` is the logical constant representing the **indeterminate logic state**.
+
+See documentation:
+
+> **`?NA`** - "Not Available" / Missing Values, NA is a **logical constant** of length 1 which contains a missing value indicator. NA can be coerced to any other vector type except raw. There are also constants NA_integer_, NA_real_, NA_complex_ and NA_character_ of the other atomic vector types which support missing values: all of these are reserved words in the R language.
+
+> **`?NULL`** - The Null Object, NULL represents the null object in R: it is a reserved word. NULL is often returned by expressions and functions whose value is **undefined**.
+
+```{r eval = FALSE}
+typeof(NA)            # the third logic state (not TRUE, and not FALSE)
+typeof(NA_integer_)   # NA is designed to fit-in with all atomic types
+typeof(NA_real_)
+typeof(NA_character_)
+
+typeof(NULL)          # NULL is its own thing (SEXPTYPE # 0 NILSXP)
+# others
+typeof(NaN)           # double
+typeof(Inf)           # double
+```
+
+Testing for `NA` and `NULL`:
+```{r eval = FALSE}
+is.na(NA)
+is.null(NULL)
+```
+
+### Missing values
+
+**With `NA`:**
+
+```{r}
+c(1,2,3)[4] # index out of range
+
+a <- c(1, 2, 3)
+length(a) <- 100
+a # positions 4 ~ 100 undefined
+```
+
+**With `NULL`**
+
+`NULL` represents
+- undefined values, declare a name that's yet to be defined
+```{r eval = FALSE}
+x <- 1:6
+dim(x)  # try to get the dim attribute of x
+```
+
+```{r eval = FALSE}
+x <- c(a = 1, b = 2, c = 3)
+x
+names(x) <- NULL # remove the names attribute of x
+x
+```
+
+```{r eval = FALSE}
+f <- function(){if(FALSE){1}}
+a <- f()
+a
+```
+
+`NULL` can be useful as a placeholder:
+
+```{r eval = FALSE}
+v1 <- c(1, 2, 3)
+# v2 <- NULL # same as v2 <- c()
+for (ii in 1:10) {
+  v2 <- c(v2, v1)
+}
+
+```
+
+
+### Indeterminate state
+
+`NA` represents logical indeterminacy, a third state that is neither TRUE nor FALSE
+
+```{r eval = FALSE}
+NA * 11
+sum(c(NA, 1, 2, 3))
+NA && TRUE
+NA || FALSE
+NA > 1
+NA == NA
+NA != NA
+is.na(NA)
+
+NaN == NaN
+NA == NaN
+```
+
+Operations on NA does not necessarily produce NA:
+```{r eval = FALSE}
+NA || TRUE
+NA && FALSE
+length(c(NA, NA))
+```
+
+
+
+## Attributes
+
+### Context matters
+
+Atomic vectors are linear 1-dimensional data structures. As the primitive types of the language, atomic vectors are designed to hold units of data of different type. However, **data by itself doesn't tell the full story**. Take this definition of a numeric vector as an example:
+
+```{r eval = FALSE}
+d <- c(10, 22, 35)
+```
+
+What does the values in `d` represent? The number of students in three classes? The age of three patients in a clinic? The number of flu cases in three clinics?
+
+**The description of data (meta data) gives meaning to the data, it transforms data to information.** The same piece of data can be interpreted completely differently given different meta descriptions (i.e. context).
+
+Context matters, just as in human language:
+
+::: column-margin
+![Illustration: context matters](img/3_context_matters.png)
+:::
+
+### Add attributes
+
+In R, attributes may be added to the data structure to provide the context. More complex data structures such as matrices are defined by adding attributes to atomic vectors.
+
+We start by adding arbitrary attributes with `attr`:
+
+```{r}
+d <- c(10, 22, 35)
+attr(d, "city") <- "oxford" # set attribute city to the value of oxford
+attr(d, "country") <- "uk"
+attr(d, "data") <- "flu cases"
+str(d)  # ?str - compactly display the structure of an arbitrary R object
+attr(d, "city") # get the city attribute of object d
+```
+
+To retrieve all attributes of an object:
+```{r}
+attributes(d)
+```
+
+In R, two attributes are commonly used to structure vectors.
+
+ - **names** - a character vector naming each element of the data vector.
+ - **dim** - an integer vector specifying the size of each dimension
+
+### Names
+
+You can name each of the data element with the `names` attribute:
+```{r eval = FALSE}
+d <- c(10, 22, 35)
+attr(d, "names") <- c("class_a", "class_b", "class_c")
+str(d)
+```
+
+Because `names` is a special attribute that R understands, there are a few quicker ways to set it:
+```{r eval = FALSE}
+# Set the names attribute when creating the vector:
+d <- c(class_a = 10, class_b = 22, class_c = 35)
+
+# With the names function:
+d <- c(10, 22, 35)
+names(d) <- c("class_a", "class_b", "class_c")
+
+# With `setNames`
+d <- setNames(c(10, 22, 35), c("class_a", "class_b", "class_c"))
+```
+
+Once the data elements are named, you can retrieve elements using the name assigned to it.
+
+```{r eval = FALSE}
+d[["class_a"]]
+```
+
+Names can be removed by `unname` or set `names` as `NULL`
+
+```{r eval = FALSE}
+unname(d)
+
+d <- c(class_a = 10, class_b = 22, class_c = 35)
+names(d) <- NULL
+d
+```
+
+### Dimensions (Matrix)
+
+Matrices are vectors with `dim` attributes
+
+```{r eval = FALSE}
+d <- c(1, 2, 3, 4, 5, 6)
+attr(d, "dim") <- c(2, 3)
+d
+attr(d, "dim") <- c(3, 2)
+d
+```
+
+Same as `names`, there are quicker ways to construct matrices:
+```{r, eval = FALSE}
+# With the `matrix` function
+d <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2, ncol = 3)
+
+# With the `dim` function
+d <- c(1, 2, 3, 4, 5, 6)
+dim(d) <- c(2, 3)
+d
+```
+
+As you can see, the default ordering in R is **column-major**:
+
+![[image source](https://en.wikipedia.org/wiki/Row-_and_column-major_order#/media/File:Row_and_column_major_order.svg)](img/3_column_row_major.png)
+
+The `byrow` argument let you populate rows first:
+```{r, eval = FALSE}
+d <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2, ncol = 3, byrow = TRUE )
+d
+```
+
+What happens if you supply **fewer** elements than the matrix's capacity?
+```{r eval = FALSE}
+d <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 3)
+```
+
+What about now?
+```{r eval = FALSE}
+d <- matrix(c(1, 2, 3), nrow = 2, ncol = 3)
+```
+
+What happens if you supply **more** elements than the matrix's capacity?
+```{r eval = FALSE}
+d <- matrix(c(1, 2, 3, 4, 5, 6, 7, 8), nrow = 2, ncol = 3)
+```
+
+What about now?
+```{r eval = FALSE}
+d <- matrix(c(1, 2, 3, 4, 5, 6, 7, 8), nrow = 1, ncol = 4)
+```
+
+ - <span class="quote-emph">Don't **ignore** warnings!</span>
+ - <span class="quote-emph">Don't **rely on** warnings!</span>
+
+
+::: column-margin
+![[image source](https://twitter.com/garabatokid/status/1172434017418760193/photo/1)](img/3_warnings.png)
+:::
+
+
+There are a few functions related to matrix operations (these also work with data frames).
+```{r, eval = FALSE}
+d <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2, ncol = 3)
+t(d)       # transpose
+diag(d)    # diagonal
+d * d      # element-wise multiplication (inner product)
+d %*% t(d) # matrix multiplication
+
+outer(1:10, 1:4) # outer product of two vectors
+1:10 %o% 1:4
+
+nrow(d) # get the number of rows
+ncol(d) # get the number of columns
+
+rownames(d) <- c("a", "b")         # set row names
+colnames(d) <- c("c1", "c2", "c2") # set column names, duplicates allowed
+d
+
+d[, "c2"] # only the first match is returned when dubplicates exist
+
+
+rownames(d) # get row names
+colnames(d) # get column names
+
+d
+d1 <- rbind(d, c(11, 12, 13)) # add a row
+d2 <- cbind(d, c(21, 22))     # add a column
+
+rownames(d1)
+colnames(d2)
+
+is.matrix(d)            # if the object is a matrix
+
+d3 <- c(1, 2, 3)
+attr(d3, "dim") <- c(3)
+is.matrix(d3)
+attr(d3, "dim") <- c(1, 3)
+is.matrix(d3)
+```
+
+Outer product of two vectors $v_1\otimes v_2$ is very useful to vectorise functions that require two inputs:
+
+```{r eval = FALSE}
+v1 <- 1:10
+v2 <- 1:3
+outer(v1, v2, FUN = function(x, y){x + 2*y} )
+```
+
+Structures with higher dimensions are referred to as `array` ()
+```{r eval = FALSE}
+d1 <- 1:12
+attr(d1, "dim") <- c(2, 2, 3)
+
+d2 <- array(1:12, c(2, 2, 3))
+identical(d1, d2)
+
+is.matrix(d2)
+is.array(d2)
+```
+
+
+### Class
+
+From an implementation point of view, `class` is simply another attribute that can be added to vectors:
+```{r eval = FALSE}
+v <- c(1, 2, 3)
+attr(v, "class") <- "abc"
+```
+
+What makes the `class` attribute different from other attributes, is that a set of behaviours are associated with certain built-in classes that R recognises. This is similar to when setting the `dim` attribute to a vector:
+
+```{r eval = FALSE}
+a <- 1:10
+attr(a, "dim") <- c(2, 6) # R checks length of object against given dimensions
+```
+
+We give introduction to two built-in classes
+
+ - `factor` - for categorical data
+ - `Date` - for date data
+
+
+#### Factor
+
+A `factor` is a vector of data that takes a small number of distinct values (i.e. categorical data).
+
+```{r eval = FALSE}
+f <- factor(c("apple", "banana", "coconut", "apple", "apple", "banana"))
+str(f)
+typeof(f)
+attributes(f)
+levels(f)
+class(f)
+```
+
+As you can see, the underlying atomic type is integer, and it has `levels` attribute in addition to the `class` attribute. You can manually construct a vector of factors too:
+
+```{r eval = FALSE}
+f2 <- c(1L, 2L, 3L, 1L, 1L, 2L)
+attr(f2, "levels") <- c("apple", "banana", "coconut")
+attr(f2, "class") <- "factor"
+
+identical(f, f2)
+```
+
+`gl(n, k, length = n*k, labels = seq_len(n))` **g**enerate `n` factors (**l**evels) each is repeated `k` times.
+```{r eval = FALSE}
+gl(n = 4, k = 2, labels = c("apple", "banana", "coconut", "durian"))
+gl(4, 1)
+```
+
+A useful function that works well with factors is `table` which gives a summary of a vector of categorical values:
+```{r eval = FALSE}
+table(c("apple", "banana", "coconut", "apple", "apple", "banana"))
+table(rpois(100, 5))
+```
+
+`cut` divides the range of `x` into intervals. Each interval is designated with a level.
+
+```{r eval = FALSE}
+cut(1:10, breaks = 2)
+table(cut(1:10, breaks = 2))
+```
+
+#### Date
+
+```{r eval = FALSE}
+d <- Sys.Date()
+typeof(d)
+attributes(d)
+as.numeric(d) # the numeric value represents the number of days since 1970-Jan-01 (Unix Epoch)
+
+
+d <- as.Date("2021-01-12")
+str(d)
+d + 30
+
+d <- as.Date("2021-01-12", format = "%Y-%d-%m")
+d + 30
+
+
+d1 <- as.Date("2020-02-25", format = "%Y-%m-%d")
+d2 <- as.Date("2020-03-25", format = "%Y-%m-%d")
+l <- d2 - d1
+l
+typeof(l)
+attributes(l)
+```
+
+**Date format code**
+
+| Code   | Value  |
+| :------|:-------|
+| %d     | Day of the month (decimal numeric) |
+| %m     | Month (decimal numeric) |
+| %b     | Month (abbreviated) |
+| %B     | Month (full name) |
+| %y     | Year (2 digits) |
+| %Y     | Year (4 digits) |
+
+```{r eval = FALSE}
+weekdays(Sys.Date())
+months(Sys.Date())
+quarters(Sys.Date())
+format(Sys.Date(), format = "%d")
+```
+
+```{r eval = FALSE}
+d <- Sys.Date()
+typeof(d)
+attributes(d)
+t <- Sys.time()
+typeof(t)
+attributes(t)
+as.POSIXct()
+```
+
+
+## Vector arithmetic
+
+When we introduced operators earlier in the module, we were
+ 
+ - Using numbers as if they were scalars
+ - Looping over values as if they were separate entities
+ 
+Having learnt new things about R from this session, knowing that data structures of R are built on vectors, what do you think is the implication of this design?
+
+Now you know that `1` is actually a vector of length 1 the first and only element of which is the value `1`, what does the expression `1 + 2` mean? Yes, you added two vectors (both of length 1) together. Therefore, all the operators in R operate assume input as vectors and gives vectors as outputs:
+
+```{r eval = FALSE}
+a <- c(1, 3, 7, 9)
+b <- c(2, 4, 6, 8)
+
+a + b
+a * b
+b %% a
+a < b
+```
+
+And our `Bmi` function works with vectors too.
+```{r eval = FALSE}
+Bmi <- function(weight, height) {
+  return(weight / height^2)
+}
+Bmi(c(60:70), seq(1.7, 1.9, length.out = 11 ))
+Bmi(60:70, 1.7)
+```
+Meaning that when you have a list of inputs, you don't need a for loop calling `Bmi` iteratively to get a list of outputs.
+
+
+Note the difference between the longer and shorter forms of `&` and `|`
+```{r eval = FALSE}
+c(TRUE, TRUE) & c(TRUE, FALSE)
+c(TRUE, TRUE) && c(TRUE, FALSE)
+
+c(FALSE, TRUE) | c(FALSE, FALSE)
+c(FALSE, TRUE) || c(FALSE, FALSE)
+```
+
+##ß `Vectorize`
+
+  - Some functions do not account for vector input.
+  - `Vectorize` creates a function wrapper that vectorizes the action of its argument function.
+  
+```{r eval = FALSE}
+# We want to generate 15 random numbers from 3 poisson distributions
+rpois(5, c(7, 70, 700)) # rpois is not vectorised
+
+Vrpois <- Vectorize(rpois, c("n", "lambda"))
+Vrpois(5, c(7, 70, 700))
+# same as mapply(rpois, 5, c(7, 70, 700))
+```
+
+## Functional programming
+
+Functions are first class objects in R:
+
+- Functions are printed just like a variable is
+```{r eval = FALSE}
+a <- 1
+a # value of a printed
+
+f <- function(x, y) {
+  return(sum(x + y))
+}
+f # implementation of f printed
+```
+- Functions can be passed on to another function like a variable:
+```{r eval = FALSE}
+f <- function(x, y, func) {
+  return(func(x + y))
+}
+f(1:2, 3:4, sum)
+f(1:2, 3:4, mean)
+```
+
+### The `apply` family
+
+```{r eval = FALSE}
+m <- matrix(1:20, nrow = 4)
+m
+apply(m, MARGIN = 1, max)
+apply(m, MARGIN = 2, max)
+```
+  - `apply` - Like its name suggests, `apply` applies a given function over a data structure, more specifically according to `?apply`: it applies functions over array margins.
+
+::: column-margin
+![[image source](http://meloukhia.net/2014/06/book_review_s_by_doug_dorst_and_jj_abrams/)](img/3_margin.png)
+:::
+
+ - `lapply` loops the top level dimension and returns a list
+ - `sapply` simplifies the returned list from `lapply` if all elements in that list is of the same length
+
+```{r eval = FALSE}
+lapply(1:10, sqrt)
+l <- list( e1 = 1:10, e2 = 11:15, e3 = c("a", "b"))
+lapply(l, FUN = max)
+unlist(lapply(l, FUN = max))
+sapply(l, FUN = max)
+identical(unlist(lapply(l, FUN = max)), sapply(l, FUN = max))
+```
+
+  - `mapply` is a multivariate version of `sapply`. `mapply` applies the function to the first elements of each argument, the second elements, the third elements, and so on. Arguments are recycled if necessary.
+
+```{r eval = FALSE}
+# We want to generate 15 random numbers from 3 poisson distributions
+rpois(5, c(7, 70, 700)) # rpois is not vectorised
+
+mapply(rpois, 5, c(7, 70, 700))   # matrix is returned if possible
+mapply(rpois, 5:7, c(7, 70, 700)) # otherwise a list is returned
+
+```
+
+Outer product of two vectors $v_1\otimes v_2$ is very useful to vectorise functions that require two inputs:
+
+```{r eval = FALSE}
+v1 <- 1:10
+v2 <- 1:3
+outer(v1, v2, FUN = function(x, y){x + 2*y} )
+```
+
+
+
+## Arithmetic precision
+
+`double` and `integer` are referred to as **numeric** types in R.
+
+```{r eval = FALSE}
+is.numeric(123L)
+is.numeric(.123)
+```
+
+Many experienced R users are able to write perfectly functioning R codes without knowing that there are two numeric types in R. R's dynamic typing system (see [Typing systems]), and use of implicit conversion (see [Coercion]) make this possible. But knowing the difference between the two types and their implementation will help you diagnose your code when it is not working as intended. Take a look at the following example:
+
+```{r eval = FALSE}
+(0.1 + 0.2) == 0.3 # what is the value of this expression? Is it what you are expecting?
+(.1 + .2) - .3
+```
+
+Recall when we introduced relational operators (`==`, `!=`,...), we emphasized that only use these operators for integer values. What if we convert the doubles to integers?
+
+```{r eval = FALSE}
+(0.1 + 0.2) * 10 == 0.3 * 10
+as.integer((0.1 + 0.2) * 10) == as.integer(0.3 * 10)
+```
+
+As stated in [Why doesn’t R think these numbers are equal?, R FAQ](https://cran.r-project.org/doc/FAQ/R-FAQ.html#Why-doesn_0027t-R-think-these-numbers-are-equal_003f) :
+
+> <span class="quote-emph">The only numbers that can be represented **exactly** in R’s numeric type are integers and fractions whose denominator is a power of 2.</emph>
+
+> `?all.equal` - The function `all.equal()` compares two objects using a numeric tolerance of `.Machine$double.eps ^ 0.5`. If you want much greater accuracy than this you will need to consider error propagation carefully.
+
+```{r eval = FALSE}
+all.equal((0.1 + 0.2), 0.3)
+```
+
+The short answer to this question is **precision**. More precisely, the precision of the representation of fractions is limited in a computer.
+
+```{r eval = FALSE}
+sprintf("%.30f", 0.1 + 0.2) # sprintf is a wrapper for the identically named C function. see `?sprintf`
+sprintf("%.30f", 0.3)
+```
+
+You can also use this website [Decimal to binary converter IEEE 754](https://www.binaryconvert.com/convert_double.html) to see the binary representation of double typed values.
+
+For the long answer, see [0.300...004].
+
+## Exercises {-}
+
+See @sec-exercises-3 for more exercises on usages of vectors.
+
+
+## Further Topics
+
+[Evaluating the Design of the R Language, Objects and Functions For Data Analysis](http://janvitek.org/pubs/ecoop12.pdf)
+
+### Scalar and vectors
+
+(More details on this topic will be provided in the "Mathematics for Modellers" module taking place in week 2.)
+
+We illustrate the difference between scalars and vectors with this simple example in a 2-dimensional space:
+
+![[image source](https://en.wikipedia.org/wiki/Scalar_(mathematics))](img/3_scalar_vector.png)
+
+
+In the x-y space (2-dimensional) illustrated above, when considered independently, x and y are two scalar values. When combined, (x, y) defines the direction of the vector v in respect to the origin (where the two axis intersect).
+
+And of course, you can imagine in a 3-dimensional space (an x-y-z space), a vector is defined as v = (x, y, z). The list of values inside the parentheses gets longer as the number of dimensions of the space gets higher.
+
+In some programming languages, vectors are referred to as arrays.
+
+> Did you know that **mosquitos** are referred to as **vectors** in infectious disease modelling?
+
+
+### Statement terminator
+
+The code snippet below has three lines of code.
+```{r eval = FALSE}
+a <- 1
+b <- 2
+print(a + b)
+```
+
+If we add `;` at the end of each statement, we can write all three statements in one line of code:
+```{r eval = FALSE}
+a <- 1; b <- 2; print(a + b) # not good practice, don't do this
+```
+
+In programming languages, a syntax like `;` is referred to as a **statement terminator** (or delimiter). As the name suggests, it indicates the end of a statement. In languages such as C and Java, `;` is the only statement terminator, thus the use of `;` is mandatory. In R (and Python, Javascript, Matlab ...), additional to semicolons, a new line **may** indicate the end of a statement, therefore `;` can be omitted in most cases.
+
+> [3.2 Control structures, R Language Definition](https://cran.r-project.org/doc/manuals/r-devel/R-lang.html#Control-structures): Both semicolons and new lines can be used to separate statements. A semicolon always indicates the end of a statement while a new line may indicate the end of a statement. If the current statement is not syntactically complete new lines are simply ignored by the evaluator. If the session is interactive the prompt changes from ‘>’ to ‘+’.
+
+The difference between a new line and a semicolon is that it only "may" be the end of a statement. This is why we can split a long statement into multiple lines without getting an error:
+```{r eval = FALSE}
+l <- list(
+  c(1, 2, 3),
+  1.2,
+  "age"
+)
+```
+
+This is good, but <span class="quote-emph">if you are used to program in a language in which a semicolon is mandatory, you need to be aware that a statement may end before you think it does</span>:
+```{r eval = FALSE}
+a <- 1 + 2 + 3 + 4
+   + 5 + 6 + 7 + 8    # what is the value of a?
+```
+
+::: column-margin
+![Have you found it yet?](img/3_semicolon.png)
+:::
+
+### null in computers
+
+Computer programs have the tendency to frame everything in binary forms: the power is either on or off, a key on the keyboard is either pressed or not, a website is either online or offline. With a sequence of binary switches, all real numbers can be represented by their corresponding binary form. Surely, there is nothing left to cover, right?
+
+Hold on, what about **nothing** ? What represents nothing?
+
+Programming languages often refer to this nothing-ness using the word "null". Unix systems have the `dev/null` device for dumping outputs, SQL uses NULL to indicate values missing from a database, a null pointer indicates that the target is not a valid object in languages such as C++.
+
+::: column-margin
+![Illustration: Pointer and Null pointer](img/3_null_pointer.png)
+:::
+
+In the case of null pointer, its definition requires the guarantee that a null pointer does not compare equal to any pointer that point to a valid object. This is an example of the next layer of issue caused by this nothing-ness:
+
+Mixing null value with other values often produces ambiguous results. This state is **indeterminate**, neither `TRUE` or `FALSE`. See [Three-valued logic](https://en.wikipedia.org/wiki/Three-valued_logic)
+
+In summary, to understand the use of `NA` and `NULL`, it is important to note the distinction between the two null-related issues computer programs have to deal with:
+
+ 1. Missing or undefined values
+ 2. Indeterminate logic state
+
+
+
+More on this topic:
+
+- [R : NA vs. NULL](https://www.r-bloggers.com/2010/04/r-na-vs-null/)
+- [Three-valued logic](https://en.wikipedia.org/wiki/Three-valued_logic)
+- [Missing Values in R](https://faculty.nps.edu/sebuttre/home/R/missings.html)
+
+### Typing systems
+
+[Wiki: Type system](https://en.wikipedia.org/wiki/Type_system)
+
+[SO: What is the difference between statically typed and dynamically typed languages?](https://stackoverflow.com/questions/1517582/what-is-the-difference-between-statically-typed-and-dynamically-typed-languages)
+
+[Note that in dynamically typed languages, values have types, not variables.](https://en.wikipedia.org/wiki/Strong_and_weak_typing#:~:text=Note%20that%20in%20dynamically%20typed%20languages%2C%20values%20have%20types%2C%20not%20variables.)
+
+### SEXP
+
+R is primarily written in C, Fortran, and R itself. ([R source code](https://github.com/wch/r-source/)) The R software environment is a GNU package, and is freely available under the GNU General Public License. It is necessary to know something about how R objects are handled in C code. All the R objects you will deal with will be handled with the type `SEXP`, which is a pointer to a structure with typedef `SEXREC`. 
+
+**Symbolic-expression (`SEXP`) record (`REC`)** structure, is a C structure underlying every R object, accessible via a pointer of type `SEXP`.
+
+> `SEXP` is common in LISP-like language syntaxes it is a way to represent a nested list of data. For example, the simple mathematical expression "five times the sum of seven and three" can be written as a s-expression with prefix notation. In Lisp, the s-expression might look like `(* 5 (+ 7 3))`.
+
+
+`SEXPREC` is a variant type that can handle all the usual types of R objects, that is vectors of various modes, function, environments, language objects, etc.
+
+The four atomic vector types correspond to four SEXP types:
+
+ - `INTSXP` : integer vectors
+ - `REALSXP` : double vectors
+ - `CPLXSXP` : complex vectors
+ - `STRSXP` : character vectors
+ 
+`NULL` is defined with SEXPTYPE #0 `NILSXP`
+
+To learn more on this topic:
+
+- [1.1.1 SEXPTYPEs, R Internals](https://cran.r-project.org/doc/manuals/r-release/R-ints.html#SEXPTYPEs)
+- [S-expression](https://www.computerhope.com/jargon/s/s-expression.htm)
+- [Rcpp: Seamless R and C++ Integration. Matt P. Dziubinski, CppCon 2015](https://youtu.be/xiqYaHa2x4s?t=1516)
+- [ramiromagno/c3po: From C to R and back again](https://rdrr.io/github/ramiromagno/c3po/f/README.md)
+
+
+### 0.300...004
+
+So you want to know more about this:
+```{r}
+(0.1 + 0.2) == 0.3
+```
+
+What is a floating point number and how is it different from an integer?
+
+- [Floating point numbers](https://www.doc.ic.ac.uk/~eedwards/compsys/float/)
+- [Decimal to IEEE 754 Floating Point Representation](https://www.youtube.com/watch?v=8afbTaA-gOQ)
+- [IEEE 754 Standard for Floating Point Binary Arithmetic](https://www.youtube.com/watch?v=RuKkePyo9zk)
+- [Decimal to binary converter IEEE 754](https://www.binaryconvert.com/convert_double.html)
+
+Precision issue with floating point numbers:
+
+- [Is floating point math broken?](https://stackoverflow.com/questions/588004/is-floating-point-math-broken)
+- [Floating point math](https://0.30000000000000004.com/)
+- [What Every Computer Scientist Should Know About Floating-Point Arithmetic](https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html)
+- [R in a 64 bit world](https://www.r-bloggers.com/2015/06/r-in-a-64-bit-world/)
+
+The only numbers that can be represented **exactly** in R’s numeric type are integers and fractions whose denominator is a power of 2. :
+
+- [Why doesn’t R think these numbers are equal?, R FAQ](https://cran.r-project.org/doc/FAQ/R-FAQ.html#Why-doesn_0027t-R-think-these-numbers-are-equal_003f)
+- [Appendix G “Computational Precision and Floating Point Arithmetic”, pages 753–771 of Statistical Analysis and Data Display: An Intermediate Course with Examples in R, Richard M. Heiberger and Burt Holland (Springer 2015, second edition)](http://link.springer.com/content/pdf/bbm%3A978-1-4939-2122-5%2F1.pdf)
+
+
+Relax ... everything is working as intended :)
+
+![xkcd 217 [explained](https://www.explainxkcd.com/wiki/index.php/217:_e_to_the_pi_Minus_pi)](img/3_e_to_the_pi_minus_pi.png)
+
+
+

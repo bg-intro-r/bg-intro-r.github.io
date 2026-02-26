@@ -1,0 +1,37 @@
+Accessibility - Not Now
+
+If any dialogue box asking for network credential pops up during this process, click "Cancel" to ignore it.
+- Select your WiFi network, skip by click "Continue" (button at the bottom right of window) without selecting any network from the list
+- Data & Privacy - Click "Continue" again
+- Analytics - Leave everything unticked
+- Screen Time - Click "Set Up Later" (bottom left of window)
+- Siri - Untick "Enable Ask Siri" and then "Continue"
+- Touch ID - Click "Set Up Touch ID Later" (bottom left of window). You may optionally click "Continue" to get this set up if you wish.
+- Choose Your Look - Select one from "Light", "Dark", or "Auto" (Recommended) and click "Continue"
+
+
+Select Your WiFi Network - 
+ eduroam, 
+
+
+After login
+Ignore SophosUserAgent Notification
+USB Drive - eduroam-OX_X-UoO-Oxford_2025.mobileconfig, double click, then "OK"
+- Spotlight Search
+- "General"
+- Scroll to the end to find "Device Management"
+- double click "eduroam"
+- click Install
+- Continue
+- Username - this is your SSO username followed by `@OX.AC.UK`. Your SSO username begins with the name of your college in four letters followed by a four digit number. For example, if Kellogg is your college, your SSO username will be something like `kell0001`. And that means that your eduroam username is `kell0001@OX.AC.UK`
+- Password: This is your Remote Access account password which you can register or reset via this link <https://register.it.ox.ac.uk/self/remote_access>. You can use this link <https://www.networks.it.ox.ac.uk/university/remote-access-logs> to test if you have the correct password.
+- Click Install
+
+# Configure Finder on macOS
+- Open a Finder window
+    1. In the menu at the top of the screen, click "Finder" and select "Settings"
+        - Select the "Sidebar" tab:
+            1. Tick "[home icon] your_username" (the last one under "Favourites"). This is your **home** directory / folder;
+            2. Tick "[laptop icon] MacBook Air [Service ID]" under "Locations". This is the **root** directory of your laptop;
+    2. In the menu at the top of the screen, click "View" and select "Show Path Bar"
+- Go to your home directory (You should see this as the last item under the "Favourites" group in your Finder sidebar), and create 

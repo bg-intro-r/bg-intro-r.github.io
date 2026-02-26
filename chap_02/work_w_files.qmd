@@ -1,0 +1,286 @@
+# Working with files {#sec-work-w-files}
+
+When your code refers to a file on your HD, the first thing it needs is the address of that file. The address contains directory names and file name which works as a path that leads the code to the target file, therefore we also refer to the address as the path of the file.
+
+There are two methods to compose the path of a file, namely **absolute path** and **relative path**. Read @sec-file-address-sys first if you are not familiar to the differences between these two concepts.
+
+In this section, we assume that we are working within an R project all relevant files of which are saved under one directory which we refer to as the **root directory** of the project. And we only use relative paths that begins from this root directory to address our target files.
+
+The example project has the following directory structure:
+
+```
++-- Projects
+    +-- work_w_files
+    |   +-- data
+    |   |   +-- log_day_1.csv
+    |   |   +-- log_day_2.csv
+    |   +-- main.R
+    |   +-- script_01.R
+```
+
+## Working directory
+
+Every time you open RStudio or start an interactive session (REPL), a **Working Directory** is set for that session. This is so that R knows where you are in the file system, to prepare for any I/O operations.
+
+This is similar to when you press the "Crew" button on an flight cabin. In order to answer your call, the first piece of information the cabin crew needs to know is where you are in the cabin.
+
+::: column-margin
+![[image source](https://static.boredpanda.com/blog/wp-content/uploads/2020/05/funny-jokes-pun-hub-online-fb-png__700.jpg)](img/1_getwd.png) 
+:::
+
+ - The default working directory for RStudio (when no project is open) is the user's home directory, which is:
+    - on macOS is `/Users/[your user name]`
+    - on Windows is `C:/Users/[your user name]/Documents`
+ - You can find out what your current working directory is by calling the `getwd()` function
+ - You can change the working directory with `setwd`
+ - <span class="quote-emph">**Use `file.path` to concatenate your directory names**</span>
+
+```{r eval = FALSE}
+getwd()
+setwd(file.path("C:", "temp"))
+list.files()
+```
+
+
+## `save`, `load`
+
+ - `save` writes an external representation of the current workspace/global environment to a file. That includes everything (Data, Values, Functions) that you see in the `Environment` tab.
+ - `save.image()` is a short-hand version of `save`. A file named `.RData` is created in the current working directory that contains everything in your current global environment.
+ - `load` reloads everything that was saved in the RData file into the global environment (default, specified by the `envir` argument)
+
+```{r eval = FALSE}
+save.image()
+load(file.path("C:", "Users", "bogao", "Projects", "OxfordMGH", "intro-r-material", ".RData"))
+# load(file.choose())
+load(url("https://github.com/ocelhay/como/raw/master/inst/comoapp/www/data/cases.Rda"))
+```
+
+ - You can also select the objects that you wish to save to the file
+
+```{r eval = FALSE}
+a <- 100
+b <- a * 32
+# ls()
+out_file <- file.path("data", "ab.RData")
+save(a, b, file = out_file)
+load(file = out_file)
+```
+
+## Working directory {#sec-working-dir}
+
+## `file.path` {#sec-file.path}
+
+## `save`, `load`
+
+We introduced `save` and `load` in session 1. We did not introduce the concept of environment then. So here we give an example of loading an R datafile into an environment.
+
+```{r eval = FALSE}
+e1 <- new.env()
+load(url("https://github.com/ocelhay/como/raw/master/inst/comoapp/www/data/cases.Rda"), envir = e1)
+ls(e1)
+e1$cases
+
+```
+
+## `summary`
+
+Use `summary` for an overview of the dataset
+
+```{r eval = FALSE}
+summary(e1$cases)
+```
+
+## `read.table`
+
+
+> `?read.table` - Reads a file in table format and creates a data frame from it, with cases corresponding to lines and variables to fields in the file.
+
+Patients admitted to hospital, daily, Oxford University Hospital NHS Foundation Trust, data downloaded from [this link](https://coronavirus.data.gov.uk/details/healthcare?areaType=nhstrust&areaName=Oxford%20University%20Hospitals%20NHS%20Foundation%20Trust).
+
+```{r eval = FALSE}
+file_name <- file.path("data", "data_2021-Oct-05.csv")
+# file_name <- file.choose()
+# d <- read.table(file_name)
+d <- read.table(file_name, sep = ",")
+# head(d)
+summary(d)
+```
+
+`read.csv` is a shorthand call on `read.table`
+
+```{r eval = FALSE}
+d <- read.csv(file_name) # no need for sep = ","
+summary(d)
+typeof(d)
+class(d)
+```
+
+We also notice that instead of "characters", the columns now have the correct type. This is due to the different defaults on the `header` parameter
+
+Let's read a header-less version of the csv with `file.path`
+
+```{r eval = FALSE}
+d_no_header <- read.table(
+  file.path("data", "data_2021-Oct-05_no_header.csv"),
+  sep = ","
+)
+summary(d_no_header)
+```
+
+More from the documentation `?read.table`:
+
+```{r eval = FALSE}
+read.table(file, header = FALSE, sep = "", quote = "\"'",
+           dec = ".", numerals = c("allow.loss", "warn.loss", "no.loss"),
+           row.names, col.names, as.is = !stringsAsFactors,
+           na.strings = "NA", colClasses = NA, nrows = -1,
+           skip = 0, check.names = TRUE, fill = !blank.lines.skip,
+           strip.white = FALSE, blank.lines.skip = TRUE,
+           comment.char = "#",
+           allowEscapes = FALSE, flush = FALSE,
+           stringsAsFactors = FALSE,
+           fileEncoding = "", encoding = "unknown", text, skipNul = FALSE)
+
+read.csv(file, header = TRUE, sep = ",", quote = "\"",
+         dec = ".", fill = TRUE, comment.char = "", ...)
+
+read.csv2(file, header = TRUE, sep = ";", quote = "\"",
+          dec = ",", fill = TRUE, comment.char = "", ...)
+
+read.delim(file, header = TRUE, sep = "\t", quote = "\"",
+           dec = ".", fill = TRUE, comment.char = "", ...)
+
+read.delim2(file, header = TRUE, sep = "\t", quote = "\"",
+            dec = ",", fill = TRUE, comment.char = "", ...)
+
+```
+
+From the above documentation, we can see the difference in parameter values between each of the `read.x` function.
+
+Take a look at `read.csv`'s implementation:
+```{r}
+read.csv
+```
+
+---
+
+A few useful parameters:
+
+- `stringsAsFactors`
+```{r eval = FALSE}
+d <- read.csv(file_name, stringsAsFactors = TRUE)
+summary(d)
+```
+
+- `as.is` (`?read.table`: `as.is = !stringsAsFactors`)
+```{r eval = FALSE}
+d <- read.csv(file_name, stringsAsFactors = TRUE, as.is = c(1, 2))
+summary(d)
+typeof(d$areaCode)
+typeof(d$areaType)
+```
+
+- `strip.white`
+```{r eval = FALSE}
+d <- read.csv(file_name, stringsAsFactors = TRUE)
+summary(d)
+d <- read.csv(file_name, stringsAsFactors = TRUE, strip.white = TRUE)
+summary(d)
+```
+
+- Date column
+```{r eval = FALSE}
+d$date <- as.Date(d$date)
+summary(d)
+```
+
+## `write.csv`
+
+The opposite of reading a file is to write one to the disk, `?write.csv`:
+```{r eval = FALSE}
+write.table(x, file = "", append = FALSE, quote = TRUE, sep = " ",
+            eol = "\n", na = "NA", dec = ".", row.names = TRUE,
+            col.names = TRUE, qmethod = c("escape", "double"),
+            fileEncoding = "")
+
+write.csv(...)
+write.csv2(...)
+```
+
+Note `write.csv` and `write.csv2` has different parameter defaults althought they are not shown in the documentation
+
+```{r eval = FALSE}
+write.csv(d, file = file.path("data", "write_d.csv"))
+```
+
+See implementation of `write.csv`
+```{r eval = FALSE}
+write.csv
+```
+
+- `row.names`
+
+```{r eval = FALSE}
+write.csv(
+  d,
+  file = file.path("data", "write_d.csv"),
+  row.names = FALSE
+)
+```
+
+- `na`
+
+Compare the outputs from the two calls of `write.csv`
+```{r eval = FALSE}
+d[2, 3] <- NA
+write.csv(
+  d,
+  file = file.path("data", "write_d.csv"),
+  row.names = FALSE
+)
+write.csv(
+  d,
+  file = file.path("data", "write_d.csv"),
+  row.names = FALSE,
+  na = "missing"
+)
+```
+
+## Excel spreadsheet
+
+- To read Excel spreadsheet we use the `readxl` library from [tidyverse](https://readxl.tidyverse.org/).
+- Because it is part of `tidyverse`, the returned data set is a `tibble`.
+
+```{r eval = FALSE}
+library(readxl)
+# the package comes with example data files
+readxl_example()
+file_name <- readxl_example("datasets.xlsx")
+
+
+read_excel(file_name) # reads sheet 1 by default
+excel_sheets(file_name)
+read_excel(file_name, sheet = "quakes")
+read_excel(file_name, sheet = "quakes", range = "B4:D8") # no header
+```
+
+For more information:
+
+ - `?read_excel`
+ - [https://readxl.tidyverse.org/](https://readxl.tidyverse.org/)
+
+
+## Other statistical systems
+
+Other statistical systems are available, to communicate with files used in those systems, we use the `foreign` package. We give example of importing a `.sav` from from SPSS. Read more on this: [Importing from other statistical systems](https://cran.r-project.org/doc/manuals/r-release/R-data.html#Importing-from-other-statistical-systems)
+
+```{r eval = FALSE}
+# an example .sav is packed within the foreign package
+f <- system.file("files", "electric.sav", package = "foreign")
+sav <- read.spss(file = f)
+str(sav)
+class(sav)
+
+sav <- read.spss(file = f, to.data.frame = TRUE)
+class(sav)
+```

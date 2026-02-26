@@ -1,0 +1,26 @@
+
+# Exercises 5 {-}
+
+## E5.1 {-}
+Make a graph to illustrate the relation between `Temp` and `Month` in the `airquality` dataset.
+
+
+## E5.2 {-}
+Make a graph to illustrate the relation between `count` and `spray` in the `InsectSprays` dataset.
+
+
+## E5.challenge 1: Unit circle {-}
+
+Reproduce this graph of a unit circle as much as you can:
+![[image source](https://en.wikipedia.org/wiki/Trigonometric_functions)](img/5_unit_circle.png)
+
+
+## E5.challenge 2: The Datasaurus Dozen  {-}
+
+![Datasaurus [image source](http://www.thefunctionalart.com/2016/08/download-datasaurus-never-trust-summary.html)](img/5_datasaurus.png)
+
+The Datasaurus Dozen is a modern adaptation of Anscombe's Quartet. The Datasaurus dataset was originally proposed by Alberto Cairo to emphasis the importance of visualising data [link](http://www.thefunctionalart.com/2016/08/download-datasaurus-never-trust-summary.html). It was extended to the Datasaurus Dozen dataset and published on [CHI'17](https://dl.acm.org/doi/10.1145/3025453.3025912). The dataset and its description is available via [this link](https://www.autodesk.com/research/publications/same-stats-different-graphs).
+
+ 1. Download the dataset using [this link](https://www.autodesk.com/content/dam/autodesk/www/autodesk-reasearch/Publications/pdf/The%20Datasaurus%20Dozen.zip), and plot all 13 datasets with scatter plots in a 4 x 4 grid.
+ 2. Use the blank spaces of the 4 x 4 grid with plots of your choice to illustrate that whilst these datasets are indistinguishable by summary statistics, each dataset has its own distribution pattern.
+

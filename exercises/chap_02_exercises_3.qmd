@@ -1,0 +1,59 @@
+
+# Exercises 3 {-}
+
+## E3.1 `Bmi2` {-}
+Add a return value `advice_text` to the `Bmi2` function we drafted in the lecture. The value of `advice_text` should be chosen from one of the four character strings below according to `bim_value`:
+
+ - "below 18.5 – you're in the underweight range"
+ - "between 18.5 and 24.9 – you're in the healthy weight range"
+ - "between 25 and 29.9 – you're in the overweight range"
+ - "between 30 and 39.9 – you're in the obese range"
+
+```{r eval = FALSE}
+Bmi2 <- function(weight, height) {
+  # your code
+}
+bb <- Bmi2(weight = 90, height = 1.75)
+bb[["value"]]
+bb[["reduce_weight"]]
+bb[["advice_text"]]
+```
+
+
+## E3.2 `||`, `|`, `&&`, `&` {-}
+
+Execute the following code snippet and answer the two questions in the comment:
+```{r eval = FALSE}
+rm(u)
+u # expect to see an error
+# Error: object 'u' not found
+
+# 1. Why do the next two expressions evaluate to different results and why?
+TRUE || u
+TRUE | u
+
+# 2. Why do the next two expressions evaluate to different results and why?
+FALSE && u
+FALSE & u
+```
+
+
+## E3.3 `table` {-}
+
+Given `t <- table(c("apple", "banana", "coconut", "apple", "apple", "banana"))`
+   1. What is the base type of `t`?
+   2. What attributes are associated with `t`?
+   3. What do you know about each of `t`'s attributes?
+   4. Which attribute(s) does `t` share with a matrix?
+   
+
+## E3.4 `apply` {-}
+
+The `runif` function generates a vector of [uniformly distributed](https://en.wikipedia.org/wiki/Continuous_uniform_distribution) random numbers within a given interval. For example, `runif(10, min = 2, max = 3)` returns 10 random numbers between `2` and `3`.
+
+  1. With the help of this function, create a 1000 x 6 matrix of uniformly distributed values between `5` and `6`. 
+  2. Calculate the 6 column-wise averages of the 1000 x 6 matrix without using a for loop.
+
+
+
+

@@ -1,0 +1,127 @@
+# Environments
+
+Environments consist of a frame, or collection of named objects, and a pointer to an enclosing environment. The most common example is the frame of variables local to a function call; its enclosure is the environment where the function was defined (unless changed subsequently). The enclosing environment is distinguished from the parent frame: the latter (returned by parent.frame) refers to the environment of the caller of a function.
+
+**Recommended readings**:
+
+- [Chapter 7, Environments, Hadley](https://adv-r.hadley.nz/environments.html)
+
+## `.GlobalEnv`
+
+The global environment is the workspace where you interact with R. When you type an expression in the console, it is evaluated in the global environment. When you create a variable or a function, it is stored in the global environment. The global environment is also the top-level environment of the search path.
+
+```{r eval = FALSE}
+f <- function(x) { #"top level function"
+  return(x * 2)
+}
+
+##-- all five give the same:
+environment()   # current environment
+environment(f)
+
+.GlobalEnv
+globalenv()
+sys.frame()
+
+identical(environment(), globalenv())
+
+is.environment(.GlobalEnv) # TRUE
+```
+
+When a function is called, the R interpreter searches the implementation of the function along the **search path** 
+```{r eval = FALSE}
+search()
+```
+
+Once a new package is attached, it is added to the top of the search path, just behind `GlobalEnv`:
+```{r eval = FALSE}
+library("ggplot2")
+search()
+```
+
+![[image source](https://adv-r.hadley.nz/environments.html#search-path) ](img/2_search_path.png)
+
+
+## Create an environment
+
+ - `new.env`, creates a new environment
+ - `ls`, returns a vector of all object (function and variable) names in an environment.
+ - `rm`, removes objects from a specified environment
+
+```{r eval = FALSE}
+e <- new.env()
+parent.env(e)
+
+e$x <- 5
+assign("y", 3, envir = e)
+ls(e)
+is.null(e$x)
+is.null(e$y)
+is.null(e$z)
+
+e$y <- NULL
+ls(e)
+
+rm(y, envir = e)
+ls(e)
+
+rm(list = ls()) # clear all in current environment
+```
+
+`ls` gives information about what's available in a package
+
+```{r eval = FALSE}
+ls("package:graphics")
+```
+
+
+## Parent
+
+Different environments can be linked together by setting the parent environment of one environment to another. When looking for an object, R will first look in the current environment, and if it doesn't find it, it will look in the parent environment, and so on until it reaches the empty environment.
+
+```{r eval = FALSE}
+ftl <- function(x) { #"top level function"
+  return(x * 2)
+}
+
+e1 <- new.env()
+e2 <- new.env(parent = e1)
+assign("a", 3, envir = e1)
+ls(e1)
+ls(e2)
+exists("a", envir = e2)   # this succeeds by inheritance
+exists("a", envir = e2, inherits = FALSE)
+is.null(e2$a)
+exists("ftl", envir = e2) # this succeeds by inheritance
+exists("ftl", envir = e2, inherits = FALSE)
+```
+
+## `.with`
+
+```{r eval = FALSE}
+a <- 10
+e <- new.env()
+e$a <- 5
+r <- with(e, {
+  print(paste("a =", a, "(with-e)"))
+  a <- 55
+  a + 500
+})
+print(paste("e$a =", e$a))
+print(paste("a =", a))
+print(paste("r =", r))
+
+
+```
+
+ - `with` can be used with both environments and list data structures that we will see in the next lecture
+
+```{r eval = FALSE}
+x <- 11
+l <- list(x = 1, y = 2)
+with(l, {
+  print(x)
+})
+print(x)
+```
+

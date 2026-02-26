@@ -1,0 +1,7 @@
+/.guarto/
+/_site/
+/_book/
+/.quarto/
+/_res/
+.DS_Store
+**/*.quarto_ipynb

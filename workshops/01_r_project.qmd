@@ -1,0 +1,10 @@
+# Structuring an R project
+
+You may have a random `.R` file somewhere on your hard drive with scribblings of codes in it. But when it comes to developing anything remotely serious, we ask you to put it in a well-structured R project that's tracked by a version control system.
+
+::: {.callout-note}
+For MGH students, it is mandatory to have all your technical work structured inside an R project which is tracked by a private GitHub repository under your chosen username. 
+:::
+
+## Version control with git
+

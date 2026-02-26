@@ -1,0 +1,94 @@
+project:
+  type: book
+number-depth: 4
+book:
+  title: "Introduction to R for Modellers"
+  author: "Bo Gao"
+  date: "8/22/2025"
+  issue-url: https://github.com/bg-intro-r/bg-intro-r.github.io
+  repo-actions: issue
+  
+  appendices:
+    # - chap_00/hardware.qmd
+    - chap_00/file_address_sys.qmd
+    - workshops/00_know_your_computer.qmd
+
+
+  chapters:
+    - index.qmd
+    - mgh.qmd
+    # - part: "Computing 101"
+    #   chapters:
+    #     - chap_00/hardware.qmd
+    #     - chap_00/file_address_sys.qmd
+    #     - workshops/00_know_your_computer.qmd
+    - part: "Language Basics"
+      chapters:
+        - chap_01/get_started.qmd
+        - chap_01/operators.qmd
+        - chap_01/function.qmd
+        - chap_01/control_flow.qmd
+        - chap_01/environments.qmd
+        - chap_01/packages.qmd
+        - chap_01/code_style.qmd
+        - exercises/exercises_all_1.qmd
+    - part: "Data Processing"
+      chapters:
+        - chap_02/containers_01.qmd
+        - chap_02/containers_02.qmd
+        - chap_02/data_manipulation.qmd
+        - chap_02/vis_base.qmd
+        - chap_02/vis_ggplot.qmd
+        - chap_02/work_w_files.qmd
+        - exercises/exercises_all_2.qmd
+    - part: "Model Building"
+      chapters:
+        - chap_03/chap_07.qmd
+        - chap_03/chap_08.qmd
+    - part: "Further Topics"
+      chapters: 
+        - chap_03/chap_09.qmd
+        - workshops/wks_02_rnumbers.qmd
+        # - workshops/slides/wks_02_slides_01.qmd
+        # - workshops/01_r_project.qmd
+        # - workshops/02_languages.qmd
+        - workshops/wks_01.qmd
+        # - workshops/eg_quarto_layout.qmd
+    # - summary_functions.qmd
+    - references.qmd
+
+  page-footer: 
+    left: "Copyright 2021 - 2025, Bo Gao" 
+    right: 
+      - icon: github
+        href: https://github.com/bogaotory
+      - icon: linkedin 
+        href: https://www.linkedin.com/in/bogaowarwick/
+
+bibliography: references.bib
+
+glossary:
+  path: glossary.yml
+  popup: click
+  show: true
+
+format:
+  html:
+    code-line-numbers: true
+    toc: true
+    toc-expand: true
+    toc-title: "On this page"
+    link-external-newwindow: true
+    cover-image: cover_03.png
+    theme:
+      - cosmo
+      - brand
+  pdf:
+    documentclass: scrreprt
+
+highlight-style: github
+
+resources:
+  - workshops/slides
+
+

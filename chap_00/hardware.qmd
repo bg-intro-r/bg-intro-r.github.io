@@ -1,0 +1,84 @@
+---
+subtitle: "Hardware components of a computer and how things navigate between them"
+lightbox: true
+reference-location: margin
+---
+
+# Hardware {#sec-hardware}
+
+## CPU, RAM, and HD 
+
+When it comes to performing a pre-programmed task, a computer, regardless of its size or value, can often be considered to be comprised of three key components: **Central Processing Unit (CPU)**, **Memory (RAM)**, and **Hard Drive (HD)**. The CPU is where data and commands gets executed, and the RAM and the HD are where those data and commands are stored. The difference between RAM and HD is that the RAM is for **temporary** storage, whereas the HD is for **permanent** storage.
+
+When a program is initiated, data and commands that are related to that program is temporarily fetched from the HD and stored in the RAM before being executed on the CPU. After processing is finished, outputs from the CPU is also temporarily placed on the RAM waiting either for further processing or being written to the HD. Nothing can be recovered from the CPU and RAM once the machine has been switched off. Everything that needs to be saved for future use needs to be written back to the HD before the machine is switched off.
+
+An example sequence of events is illustrated in @fig-hd_ram_cpu, given that the task is to run an R script that processes some data:
+
+
+::: {#fig-hd_ram_cpu}
+```{mermaid}
+sequenceDiagram
+    box rgb(230,230,230) permanent storage
+        participant HD
+    end
+    box rgb(245,245,245) temporary storage
+        participant RAM
+        participant CPU
+    end
+    HD->>+CPU: User calls for the execution of an R script
+    CPU->>-HD: Locate R and the user script
+
+    HD->>RAM: Load R and initiate an R session/environment
+    activate RAM
+
+    HD->>RAM: Load user script
+    RAM->>+CPU: Run the first line of code in script
+    CPU->>-HD: User code declares its need for some R libraries
+    HD->>RAM: Load these libraries into the R session
+    %% loop rgb(240,240,240) Run next line of your code
+        %% Note left of CPU: Run your code line by line<br/>until the end
+        RAM->>+CPU: Lines of codes are executed sequentially
+        CPU->>RAM: R environment is updated accordingly
+        CPU-->>-HD: Code asks for a file
+        HD-->>RAM: Reads the file into the R session as a data.frame
+        RAM-->>+CPU: Process data.frame 
+        CPU-->>-RAM: Update data.frame 
+        RAM-->>HD: Write data.frame to a file
+        %%   loop Run Code
+        %%     John->>RAM: Fight against hypochondria
+        %%   end
+        %% Note right of CPU: Run code <br/>until the end
+    %% end
+    RAM->>+CPU: End of user script is reached
+    CPU->>-RAM: Exit R
+    deactivate RAM
+    %%   RAM->>-RAM: Exit R
+
+```
+(Overly-simplified) Flow of events when an R script is executed. (Dotted lines signifying a sequence of input-process-output events when a piece of data is worked on).
+:::
+
+All permanent elements of your project (e.g. data, scripts, plots), basically everything that you expect to still be there after you switched your computer off and on again, resides on the HD.
+
+With the execution of your codes, more codes or data are loaded from the HD into the RAM before they are sent to the CPU for processing. At the end of your script/program, everything that you did not write back to the HD is lost.
+
+You might be familiar with locating a csv file and open it with MS Excel with tools like Finder (macOS) and File Explorer (Windows), but in order to process it with R codes, you need to learn to use functions provide by the programming language R to navigate, read, and write to the HD. You will learn more about this topic in @sec-work-w-files.
+
+::: {.callout-tip collapse="true"}
+
+If you are still not sure how the CPU, RAM, and HD work together, compare a computer with yourself when you had to take an exam at school (@tbl-pc-components) as an example:
+
+| A Computer | You taking a Physics exam |
+|------:|:---------------------|
+| CPU    | Your brain  |
+| RAM    | Your knowledge of Physics |
+| Hard Drive | All of your knowledge including Math, English, Biology, Chemistry, and Physics |
+: Roles of computer hardware components {#tbl-pc-components}
+
+You have knowledge of many disciplines. Math, English Literature, History, etc. You don't forget these knowledge just because you've had a good night's sleep. These knowledges are embedded in you, they are in a way similar to the data and functions that resides on your HD.
+
+When you take a Physics exam, hot in your head are the exam-related Physics knowledges. You revised them over and over again when preparing for the exam, so they are readily available at the top of your head (RAM) for you to answer (CPU) your exam questions. You also might not need to think about what book Shakespeare has written during the exam either, as it is not relevant to the task on hand. Once the exam has finished, you can relax and forget all about Physics for a while until the next time.
+
+This obviously is an over-simplification of a piece of sophisticated technology, but the logic isn't far from reality. Knowing this architecture is essential to help understand how the pipeline of computer code works, especially in data-oriented projects.
+
+:::

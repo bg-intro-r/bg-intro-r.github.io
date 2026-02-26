@@ -1,0 +1,7 @@
+# Key functions {.unnumbered}
+
+Here is a list of R functions that we introduced in this book.
+
+## Sequences
+
+

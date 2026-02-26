@@ -1,0 +1,26 @@
+---
+title: "Randommm Numbers and Distributions"
+format:
+  revealjs:
+    controls: true
+    navigation-mode: linear
+    chalkboard: true
+---
+
+## Base R Functions
+
+This worksheet focuses on the use of functions in the stats package (base R) related to standard probability distributions. These functions come in four variants, each with a different prefix:
+
+- `d`: Density function (probability mass function for discrete distributions)
+- `p`: Cumulative distribution function
+- `q`: Quantile function
+- `r`: Random generation function 
+
+For example, for the normal distribution, the functions are:
+
+- `dnorm()`: Density function
+- `pnorm()`: Cumulative distribution function
+- `qnorm()`: Quantile function
+- `rnorm()`: Random generation function
+
+See `?Distributions` for the full list of distributions and their corresponding function names.

@@ -1,0 +1,592 @@
+# Data Visualisation II
+
+> [What is R?](https://www.r-project.org/about.html) - R is a language and environment for statistical computing and **graphics**.
+
+- Data visualisation serves two purposes:
+  - Discovery
+  - **Presentation**
+    - R Markdown
+    - ggplot2
+    - (shiny)
+
+- R packages
+  - Both R Markdown (2014) and ggplot2 (2005) are relatively new functionalities of the R ecosystem.   - This lecture uses functionalities that are provided by the R ecosystem rather than the core base package
+
+**Recommended readings**
+
+  - [R Packages](https://r-pkgs.org/intro.html)
+  - [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+  - [ggplot2 cheatsheet](https://github.com/rstudio/cheatsheets/raw/master/data-visualization.pdf)
+  - Publication-quality figures
+    - Nicolas P. Rougier, Michael Droettboom, Philip E. Bourne, [Ten Simple Rules for Better Figures](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003833), PLOS Computational Biology, [code](https://github.com/rougier/ten-rules)
+    - Daniel Evanko, [Data Visualization: A view of every Points of View column](http://blogs.nature.com/methagora/2013/07/data-visualization-points-of-view.html), Nature Methods, methagora
+
+
+## R Markdown
+
+- This week's lecture notes are all in [R Markdown](https://rmarkdown.rstudio.com/) format (rather than powerpoint)
+- `.nb.html` are rendered notebooks (with option to download the R Markdown source)
+- Interaction with `.Rmd` files in RStudio is similar to [Jupyter Notebooks (IPython)](https://jupyter.org/try)
+- `rmarkdown` comes installed with RStudio
+
+![Illustration: R Markdown workflow](img/6_rmarkdown.png)
+
+- Write once, output in many formats
+  - As html
+  - As pdf
+    - `install.packages('tinytex')`
+    - `tinytex::install_tinytex()`
+  - As slides (ppt, HTML-based presentations)
+  
+- Combines
+  - Descriptive text
+  - Code
+  - Code result
+
+![Screenshot: Create R Markdown file](img/6_new_rmarkdown.png)
+
+---
+
+## `ggplot2`
+
+To use `ggplot2` in your script, put `library("ggplot2")` at the beginning of your `.R` script:
+```{r eval = FALSE}
+library("ggplot2")
+
+```
+
+[SO: What is the difference between `require()` and `library()`](https://stackoverflow.com/questions/5595512/what-is-the-difference-between-require-and-library)
+
+### Basics
+
+In the `graphics` package, plots are created by a combination of high-level and low-level plotting functions. Plots are first created by high-level functions. Low-level functions add/modifies elements on top of the existing plot. `ggplot2` has a similar approach.
+
+Each graph produced by `ggplot` is a top-down view on a stack of plots. At the bottom of this stack is the `ggplot` function which holds the **data** component. This data set is then mapped by `geom_*` functions (i.e. the **geom** component) onto a **coordinate system** to produce a plot.
+
+![source: https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf](img/5_grammar.png)
+
+---
+
+Each geom function has its own geometry definition of how to present the data:
+
+- `geom_line()` draws lines connecting data points
+- `geom_point()` draws data points as individuals
+- `geom_histogram` puts values of the plotted variable into bins before drawing vertical bars showing the size of each bin.
+- `geom_*`
+- To see what `geom_` functions are available in `ggplot2`:
+
+```{r}
+library("ggplot2")
+a <- grep("geom", ls("package:ggplot2"), fixed = TRUE)
+ls("package:ggplot2")[a]
+```
+
+
+As well as `ggplot` and `geom_*` functions, we have other functions such as `theme_*` functions and `scale_*` functions to tweak other elements of the graph. This group of functions are not strictly required from the user. `ggplot` provides default values in absence of user defined values. To make publication quality graphs, it is essential to understand how these functions work.
+
+---
+
+### Plotting COVID-19
+
+#### Prepare data
+
+We start by loading the `cases.Rda` file used by the [CoMo app](https://comomodel.net/)
+
+```{r eval = TRUE}
+#try(lapply(paste('package:',names(sessionInfo()$otherPkgs),sep=""),detach,character.only=TRUE,unload=TRUE), silent = TRUE) # clear additional package space if any is loaded
+rm(list = ls()) # delete all objects in current environment
+
+library(ggplot2)
+
+load(url("https://github.com/ocelhay/como/raw/master/inst/comoapp/www/data/cases.Rda"))
+ls()
+typeof(cases)
+```
+Two data sets loaded. What's in `cases`
+
+```{r}
+load(url("https://github.com/ocelhay/como/raw/master/inst/comoapp/www/data/cases.Rda"))
+#head(cases)
+#summary(cases)
+#unique(cases$country)
+
+if (knitr::is_html_output()) {
+  rmarkdown::paged_table(cases)
+} else {
+  head(cases)
+}
+```
+
+Get UK specific time series
+
+```{r}
+load(url("https://github.com/ocelhay/como/raw/master/inst/comoapp/www/data/cases.Rda"))
+uk_cases <- cases[cases[["country"]] == "United Kingdom", ] # filter rows
+uk_cases <- uk_cases[c("country", "date", "cases")]         # pick columns
+uk_cases <- uk_cases[rowSums(is.na(uk_cases)) == 0, ]       # remove NAs
+if (knitr::is_html_output()) {
+  rmarkdown::paged_table(uk_cases)
+} else {
+  head(uk_cases)
+}
+```
+
+
+#### `ggplot` base plot
+
+![source: https://github.com/rstudio/cheatsheets/raw/master/data-visualization-2.1.pdf](img/5_recall_gg_template.png)
+
+`ggplot2` states that graphs are built from 3 components:
+
+ - a data set
+ - a coordinate system
+ - geoms (specifications of aesthetic elements e.g. x and y locations, shape, size, and colour of data points)
+
+Where a sensible default coordinate system is useful for most graphs, the `<data>` and `<geoms>` components need to be provided by the user.
+
+Here we tell `ggplot` that we want to draw a plot based on a data frame named `uk_cases`, and we pick the `geom_point` function to draw the data as points on the graph. We want to map the `date` column to the x axis, and the `cases` column to the y axis.
+
+```{r}
+ggplot(data = uk_cases) +                        # data
+  geom_point(mapping = aes(x = date, y = cases)) # geom_func(mapping)
+```
+
+
+This is good, but often time series are drawn as lines. So let's replace `geom_point` with `geom_line`
+
+```{r}
+ggplot(data = uk_cases) +                       # data
+  geom_line(mapping = aes(x = date, y = cases)) # geom_func(mapping)
+```
+This looks better already. But what if I want both points and lines?
+
+- Let's stack the two layers together.
+- We also add an additional `geom_smooth` layer to give us some visual on the overall trend.
+
+```{r}
+ggplot(data = uk_cases) +
+  geom_point(mapping = aes(x = date, y = cases)) +
+  geom_line(mapping = aes(x = date, y = cases)) +
+  geom_smooth(mapping = aes(x = date, y = cases), method = "loess", span = .2)
+```
+
+The graph is overly busy for no good reason now, but we demonstrated how different layers can be created by different `geom` functions and stacked together.
+
+- More on `geom_smooth`: [https://ggplot2.tidyverse.org/reference/geom_smooth.html](https://ggplot2.tidyverse.org/reference/geom_smooth.html)
+- On `loess` : [https://en.wikipedia.org/wiki/Local_regression](https://en.wikipedia.org/wiki/Local_regression)
+
+#### Inheritance
+
+So far the `data + geom_func(aes)` grammar is readable from the code, but we also see some repetition of the code segment `mapping = aes(x = date, y = cases)` appearing 3 times in our code. To simplify our code, a mechanism called **inheritance** can be utilised.
+
+`?geom_point` and `?geom_line` both show that a parameter `inherit.aes` is `TRUE` by default, which allows both `geom` functions to inherit the aesthetics mapping from the base layer defined by `ggplot`
+
+```{r}
+ggplot(uk_cases, aes(x = date, y = cases)) +
+  geom_point() + geom_line() + geom_smooth(span = .2)
+```
+
+We can see that using inheritance, we produced exactly the same plot without repeating ourselves. ([Don't repeat yourself](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) is a principle applied in good software practices).
+
+Note that we lost the `data` and `mapping` keywords too, and the `aes` definition only appear once in the code. We now have shorter and easier code to maintain, but the *grammar* in **grammar of graphics** has become less obvious. This is also why every online tutorial is slightly different to each other despite performing the same actions. Reading others' codes is a very useful way to improve your own coding skill.
+
+
+#### Overwrite
+
+Get data for United States in `us_cases`.
+
+```{r}
+us_cases <- cases[cases[["country"]] == "United States",] # filter rows
+us_cases <- us_cases[c("country", "date", "cases")]       # pick columns
+us_cases <- us_cases[rowSums(is.na(us_cases)) == 0,]      # remove NAs
+if (knitr::is_html_output()) {
+  rmarkdown::paged_table(us_cases)
+} else {
+  head(us_cases)
+}
+```
+
+We reset the UK time series to just one plot using the points and add the US time series as a line. The UK case numbers look a lot less scary now.
+
+```{r}
+ggplot(uk_cases, aes(x = date, y = cases)) +
+  geom_point() + geom_line(data = us_cases)
+```
+
+The `data = us_cases` statement in `geom_line()` now **overwrites** the `data = uk_cases` statement inherited from the base layer constructed by the `ggplot` function.
+
+> **Question**: Here, the `aes` did not need to be re-stated in `geom_line` despite having a different `data` to plot. Why?
+
+Let's add the world total number of daily cases to our graph too. We draw all three time series with lines.
+
+```{r}
+world_sum <- aggregate(cases[, "cases"], list(date = cases[["date"]]), sum) # Forgot to filter the rows for the continents here
+#unique(cases[["country"]])
+world_sum <- world_sum[rowSums(is.na(world_sum)) == 0, ]
+
+ggplot(mapping = aes(x = date, y = cases)) +
+  geom_line(data = world_sum) + 
+  geom_line(data = uk_cases) + 
+  geom_line(data = us_cases)
+
+```
+
+Note that each of the three lines are from a different data frame.
+
+> Question: If we remove `mapping = ` from `ggplot` so that it is written like `ggplot(aes(x = date, y = cases)) + ....` would it still work?
+
+```{r eval = FALSE}
+ggplot(aes(x = date, y = cases)) +
+  geom_line(data = world_sum) +
+  geom_line(data = uk_cases) +
+  geom_line(data = us_cases)
+```
+
+
+#### Colours, labels, scales, and coordinates
+
+Now let's better the graph so that
+
+ - The three time series are distinguishable
+ - Both axes are labeled clearly 
+ - Ticks on the axes are more informative
+ - Y is in log-scale
+ - Remove the grey background
+ - Truncate the lines so that the plot covers exactly one year in time
+
+
+```{r}
+options(scipen = 999)  # turn off scientific notation like 1e+06
+
+g <- ggplot(mapping = aes(x = date, y = cases)) +
+  geom_line(data = world_sum, aes(color = "World")) +
+  geom_line(data = uk_cases,  aes(color = "UK")) +
+  geom_line(data = us_cases,  aes(color = "US")) +
+  labs(
+    x = "Dates",
+    y = "Daily Cases",
+    title = "Covid-19 daily cases comparison",
+    subtitle = "1 year tracker",
+    caption = "source: CoMo"
+  ) +
+  scale_y_log10(
+    breaks = scales::trans_breaks("log10", function(x) 10^x),
+    labels = scales::trans_format("log10", scales::math_format(10^.x))
+  ) +
+  # scale_y_continuous(
+  #   trans = "log10",
+  #   breaks = scales::trans_breaks("log10", function(x) 10^x),
+  #   labels = scales::trans_format("log10", scales::math_format(10^.x))
+  # ) +
+  annotation_logticks() +
+  theme_bw() +
+  scale_color_manual(
+    # name="",
+    values = c("World" = "black", "US" = "#50e2c1", "UK" = "#faaf3f")
+  )
+  
+g1 <- g +
+  scale_x_date(
+    date_labels = "%b",
+    date_breaks = "1 month",
+    limits = as.Date(c("2020-03-01", "2021-03-01"))
+  )
+plot(g1)
+```
+
+ - `?ggplot2::labs`
+ - `?ggplot2::scale_y_continuous`
+ - `?ggplot2::annotation_logticks`
+
+
+#### Coordinate system
+
+We can set x range by adjusting the `<coordinate system>` (last element of the grammar) instead.
+
+```{r}
+g2 <- g + 
+  coord_cartesian(
+      xlim = as.Date(c("2020-03-01", "2021-03-01"))
+  ) + 
+  scale_x_date(date_labels = "%b", date_breaks = "1 month")
+
+plot(g2)
+```
+
+Note how `g1` and `g2` differ at truncating the lines at the beginning:
+
+ - `g1`, setting `limits` in the `scale` function truncates the data before they are plotted
+ - `g2`, changing the coordinate system only modifies the viewing-window of the graph
+
+This is mostly useful when you want to zoom in to an area of the plot.
+```{r}
+g3 <- g + 
+  coord_cartesian(
+    xlim = as.Date(c("2020-07-01", "2020-08-01"))
+  ) +
+  scale_x_date(
+    date_labels = "%b", 
+    date_breaks = "1 month"
+  )
+
+plot(g3)
+```
+
+#### Annotations
+
+```{r}
+uk_peak <- uk_cases[which.max(uk_cases[["cases"]]),]
+g11 <- g1 +
+  geom_curve(aes(
+      xend = uk_peak[["date"]],
+      yend = uk_peak[["cases"]],
+      x = uk_peak[["date"]]+60,
+      y = uk_peak[["cases"]]*1.5
+    ),
+    curvature = 0.2,
+    arrow = arrow(length = unit(10, "points"))
+  ) +
+  geom_point(data = uk_peak, color = "#ffaf3f") +
+  annotate(
+    geom = "text",
+    label = "UK max",
+    x = uk_peak[["date"]]+80,
+    y = uk_peak[["cases"]]*1.5
+  )
+plot(g11)
+```
+ 
+- `?ggplot2::annotation_logticks`
+
+## Long and wide data format
+
+In the previous section, we used three separate data frames side by side which resembles a **Wide** data format. For data in this format, each series is stored in its own column. No filtering is needed once the column has been specified. The `<data>` component needs redefinition in each `<geom>` layer because a different column is used.
+
+The same set of data can be rearranged in a **Long** format. In such format, all series keep their data in the same column. To distinguish ownership of each row's data, an extra column is created.
+
+![Illustration: Wide vs Long data format](img/5_wide_long_format.png)
+
+```{r}
+world_sum["country"] <- "World Total"
+long_data <- rbind(uk_cases, us_cases, world_sum)
+ggplot(data = long_data, mapping = aes(x = date, y = cases)) +
+  geom_line(aes(colour = country))
+
+```
+
+Note how R automatically added a legend to the plot. This comes when an aesthetic setting is dependent on a column,`colour = country` in this case.
+
+
+
+## More plot types
+
+### Scatter
+```{r}
+per_country_sum <- aggregate(
+  x = list(cases[, "cases"], cases[,"deaths"]),
+  by = list(country = cases[["country"]]),
+  FUN = sum,
+  na.rm = TRUE
+)
+
+library("countrycode")
+per_country_sum[["continent"]] <- countrycode(
+                                      sourcevar = per_country_sum[,"country"],
+                                      origin = "country.name",
+                                      destination = "continent"
+                                    )
+
+per_country_sum <- per_country_sum[rowSums(is.na(per_country_sum)) == 0,]
+per_country_sum <- per_country_sum[per_country_sum["deaths"] > 10,]
+
+#paged_table(per_country_sum)
+
+g4 <- ggplot(data = per_country_sum, aes(x = cases, y = deaths, colour = continent)) +
+  geom_smooth(data = per_country_sum, mapping = aes(colour = NULL), method = "lm", span = .2) +
+  geom_point() +
+  scale_y_log10(
+    breaks = scales::trans_breaks("log10", function(x) 10^x),
+    labels = scales::trans_format("log10", scales::math_format(10^.x)),
+    limits = c(10,10^6)
+  ) +
+  scale_x_log10(
+    breaks = scales::trans_breaks("log10", function(x) 10^x),
+    labels = scales::trans_format("log10", scales::math_format(10^.x)),
+    limits = c(10,10^8)
+  ) +
+  annotation_logticks() +
+  coord_fixed()
+
+plot(g4)
+
+```
+ 
+```{r}
+
+min_death_rate <- per_country_sum[
+                    which.min(
+                      per_country_sum[["deaths"]]/per_country_sum[["cases"]]
+                    ),
+                  ]
+max_death_rate <- per_country_sum[
+                    which.max(
+                      per_country_sum[["deaths"]]/per_country_sum[["cases"]]
+                    ),
+                  ]
+max_death_count <- per_country_sum[
+                    which.max(
+                      per_country_sum[["deaths"]]
+                    ),
+                  ]
+max_cases_count <- per_country_sum[
+                    which.max(
+                      per_country_sum[["cases"]]
+                    ),
+                  ]
+
+interested_countries <- per_country_sum[is.element(
+                            per_country_sum[["country"]],
+                            c("United Kingdom", "Australia", "Japan")
+                        ),]
+
+highlighted_rows <- rbind(
+                      min_death_rate,
+                      max_death_rate,
+                      max_death_count,
+                      max_cases_count,
+                      interested_countries
+                    )
+
+g41 <- g4 +
+  geom_point(
+    data = highlighted_rows,
+    shape = 4,
+    size = 5
+  ) +
+  geom_label(
+    data = highlighted_rows,
+    mapping = aes(label = country),
+    nudge_x = 0.3,
+    nudge_y = 0.4
+  )
+
+plot(g41)
+
+```
+
+### Density
+```{r}
+
+per_country_sum[["death_rate"]] <- per_country_sum[["deaths"]]/per_country_sum[["cases"]]
+
+g5 <- ggplot(per_country_sum, aes(x = death_rate))
+g5 +
+  geom_density(aes(color = continent), alpha = 0.4) #+
+  #scale_x_continuous(limits = c(0,0.1))
+
+
+```
+
+### Boxplot
+```{r}
+#per_country_sum[["death_rate"]] <- per_country_sum[["deaths"]]/per_country_sum[["cases"]]
+per_country_sum_no_yemen <- per_country_sum[per_country_sum[["country"]] != "Yemen",]
+
+g6 <- ggplot(
+  per_country_sum_no_yemen,
+  aes(
+    x = continent,
+    y = death_rate,
+    fill = continent,
+  ),
+  alpha = 0.5
+)
+g_vio <- g6 + geom_violin()
+g_box <- g6 + geom_boxplot()
+plot(g_box)
+plot(g_vio)
+```
+
+## Other related packages
+
+- `ggsci`, [Scientific Journal and Sci-Fi Themed Color Palettes for ggplot2](https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html)
+
+- `gridExtra`, [Miscellaneous Functions for "Grid" Graphics](https://cran.r-project.org/web/packages/gridExtra/vignettes/arrangeGrob.html)
+
+
+```{r}
+library("ggsci")
+library("gridExtra")
+g_box_npg <- g_box + scale_fill_npg()
+g_box_nejm <- g_box + scale_fill_nejm()
+g_box_lancet <- g_box + scale_fill_lancet()
+g_box_jama <- g_box + scale_fill_jama()
+grid.arrange(g_box_npg, g_box_nejm, g_box_lancet, g_box_jama, ncol = 2)
+```
+
+- `ggExtra`, [Marginal Histograms and Boxplots](https://cran.r-project.org/web/packages/ggExtra/vignettes/ggMarginal.html)
+
+```{r}
+library("ggExtra")
+ggMarginal(g41, type = "histogram")
+```
+
+
+
+## Read more about `ggplot2`
+
+ - 50 Examples http://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html
+ - ggplot2: Elegant Graphics for Data Analysis https://ggplot2-book.org/introduction.html
+ - grid.arrange https://cran.r-project.org/web/packages/egg/vignettes/Ecosystem.html
+
+
+## Challenge
+
+Find an open access article from [Nature Communications](https://www.nature.com/ncomms/articles?type=article) and reproduce a plot from the article. 
+
+ - Articles are listed on [https://www.nature.com/ncomms/articles?type=article](https://www.nature.com/ncomms/articles?type=article)
+ - Use the search box on the top right of the page to find articles of your interest (e.g. "covid-19", "malaria", "epidemiology", "modelling etc. ).
+ - Most articles include the data they use for their figures in the "Source Data" section.
+ - Use the source data
+ - e.g. https://www.nature.com/articles/s41467-021-24997-7#Sec41
+
+Your version of the plot can be a exact replica of the author's plot if you think it is of good quality, you can also make an improved version of the original plot if you see fit.
+
+
+# **Further Topics** {-}
+
+## Publication-quality figures {-}
+
+- Nicolas P. Rougier, Michael Droettboom, Philip E. Bourne, [Ten Simple Rules for Better Figures](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003833), PLOS Computational Biology, [code](https://github.com/rougier/ten-rules)
+- Daniel Evanko, [Data Visualization: A view of every Points of View column](http://blogs.nature.com/methagora/2013/07/data-visualization-points-of-view.html), Nature Methods, methagora
+
+- Tamara Munzner, Talk on d3.unconf(2015), Video: [Visualization Analysis & Design](https://www.youtube.com/watch?v=jVC6SQS23ak)
+- Tamara Munzner, Talk, [Visualisation Analysis & Design](https://www.cs.ubc.ca/~tmm/talks/minicourse14/vad15sydney-4x4.pdf)
+- Tamara Munzner, Video: [Map Color and Other Channels. Visualization Analysis & Design Tutorial, Video 6](https://www.youtube.com/watch?v=Nz-0MnRZIgA)
+
+## Colours in R {-}
+
+- [R color cheat sheet](https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf)
+- [Colors in R](http://www.sthda.com/english/wiki/colors-in-r)
+
+
+
+## The `+` operator {-}
+
+Each layer on the ggplot graph stack is defined by a function, and these functions are all concatenated with the `+` operator. We know how `+` is defined for [literals](https://en.wikipedia.org/wiki/Literal_(computer_programming)), such as in `1 + 2` or `"abc" + "def"`. But what does it do in between ggplot functions?
+
+Whereas commonly used math functions such as `max`, `abs`, and `sqrt` return the user with a numerical value, these functions such as the geom functions perform a set of procedures that either produce or modify a plot or several plots in the graph stack. The `+` operator here not only *sticks* these plots and performs the procedures one by one to produce the final graph. Because these functions are of different nature, the `+` operator in this context also acts as a [*dispatcher*](https://en.wikipedia.org/wiki/Multiple_dispatch). For those interested in knowing more about this subject and what's going on behind the scenes:  
+
+```{r, eval = FALSE}
+> ggplot2:::`+.gg`
+function (e1, e2) {
+  e2name <- deparse(substitute(e2))
+  if (is.theme(e1))
+    add_theme(e1, e2, e2name)
+  else if (is.ggplot(e1))
+    add_ggplot(e1, e2, e2name)
+}
+
+```
+ref: [https://stackoverflow.com/questions/40450904/how-is-ggplot2-plus-operator-defined](https://stackoverflow.com/questions/40450904/how-is-ggplot2-plus-operator-defined)
+

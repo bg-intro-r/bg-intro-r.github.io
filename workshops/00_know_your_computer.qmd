@@ -1,0 +1,79 @@
+---
+lightbox: true
+reference-location: margin
+---
+
+# Know your computer
+
+## Operating System Tools
+
+| macOS | Windows |
+|------:|:------|
+| Finder | File Explorer  |
+| Terminal | Command Prompt |
+
+: Equivalent applications on macOS and Windows {#tbl-os-apps}
+
+See @tbl-os-apps.
+
+## Terminal (Command Line) {#sec-terminal}
+
+Before the advent of mainstream computer graphical interfaces (e.g. Microsoft Windows and macOS) that display buttons that the user may click with a cursor controlled by a mice, the only way to interact with a computer is by spelling things out (using the keyboard) to the computer on the command line space provided by a terminal.
+
+::: {#fig-terminals layout-ncol=2}
+
+![System Terminal](img/00/sys_term.png){#fig-sys_term}
+
+![R Terminal](img/00/r_term.png){#fig-r_term}
+
+Terminals
+:::
+
+For example, in macOS, @fig-sys_term is a screenshot of a system level terminal, and @fig-r_term is a R language specific terminal. These terminals are able to interpret text-based commands that you type between the prompts (e.g. `$`, `>`, `\>`) and the `Enter` key that you type (which indicates the end of the command in most terminals).
+
+In the literature, you will come across terminologies such as "Console", "Shell" which implies the same context as "Terminal" and "Command Line" do. To know more about the differences between these terms, read [@gfg_terminal].
+
+The interactive process that take place in a terminal, for its **R**ead -> **E**valuation -> **P**rint -> Read -> Evaluation ... sequence of **L**ooped events, is also known as a (language-specific) **REPL**. This is a common terminology used for interpreted languages such as R and Python that allow this type of interaction.
+
+In the context of this book/module, "R terminal", "R Console", "R REPL" all refer to the same program that sends your R commands to the R interpreter and prints the corresponding output back to you on the screen.
+
+
+
+::: {.callout-note}
+In this book:
+
+- A **`$`** character at the beginning of the line of code indicate that the code is to be type in to the OS-level terminal. See @fig-sys_term
+
+- A **`>`** or no character at the beginning of the line of code indicate that this is R code which is to be typed in the R terminal. See @fig-r_term
+:::
+
+
+
+## Developer Tools
+
+### macOS
+
+- Xcode Command Line Tools
+
+> The Command Line Tools Package is a small self-contained package available for download separately from Xcode and that allows you to do command line development in macOS. It consists of the macOS SDK and command-line tools such as Clang, which are installed in the /Library/Developer/CommandLineTools directory. - [@XcodeCommandLineTools_Apple]
+
+To install Xcode Command Line Tools:
+
+```
+$ xcode-select --install
+```
+
+To see where Xcode Command Line Tools is installed on your computer:
+
+```
+$ xcode-select -p
+```
+
+To see what tools have been installed as part of the Xcode Command Line Tools package:
+
+```
+$ ls /Library/Developer/CommandLineTools/usr/bin/
+```
+You can see tools such as `git`, `g++`, `make`, `python3`, `pip3` installed in that directory. Note that Python developers should download and install Python properly from the [official Python site](https://www.python.org/downloads/) instead of using the version installed with Xcode Command Line Tools.
+
+You can read more about this process from [@XcodeCommandLineTools_PA]

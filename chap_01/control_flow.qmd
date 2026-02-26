@@ -1,0 +1,249 @@
+# Control Flows
+
+So far, the functions we wrote (`IsEven`, `IsMonth`, `IsLeapYear`) are simple enough in that their return values are straightforward logical combinations of arithmetic operations. Therefore, we are able to implement all three functions with a sequence of operators. In reality, the logic required of a function is often more complex, and **control flow** statements are needed.
+
+Control flow statements defines the order in which functions are executed. Each programming language differs slightly in its implementation of control flows. We give introduction to the commonly used control flow statements used in R. 
+
+**Recommended readings**:
+
+- [Chapter 5, Control flow, Hadley](https://adv-r.hadley.nz/control-flow.html)
+- [Chapter 8, Conditions, Hadley](https://adv-r.hadley.nz/conditions.html)
+
+## Choice
+
+> Example: Implement a function `DaysInYear` that returns the number of days in a given year. (A year has 365 days except for when it is a leap year when it has 366 days)
+
+We have `IsLeapYear` which identifies a leap year. Based on the return value from `IsLeapYear`, we need to choose between `365` and `366` as the return value for `DaysInYear`. Its logic can be illustrated with a flow chart:
+
+![Flow chart for `DaysInYear`](img/2_DaysInYear.png)
+
+### `if`, `else`, `else if`
+
+```{r eval = FALSE}
+DaysInYear <- function(x) {
+  if (IsLeapYear(x)) {
+    return(366)
+  } else {
+    return(365)
+  }
+}
+DaysInYear(2000)
+DaysInYear(1999)
+```
+
+The use of `if`...`else` statement creates **two branches** of code that are selectively executed upon the evaluation of a condition. i.e. A choice is made between two options.
+
+What if we have more than two options to choose from?
+
+> Example: A customer gives a score between 0 and 10 as to rate a service received. And the following function `GradeServiceScore` translates the score to 3 levels of grades:
+
+```{r eval = FALSE}
+GradeServiceScore <- function (score) {
+  if (score >=7) {
+    return("Satisfied")
+  } else if (score >= 4) {
+    return("Neutral")
+  } else {
+    return("Dissatisfied")
+  }
+}
+GradeServiceScore(10)
+GradeServiceScore(4.5)
+GradeServiceScore(-100)
+```
+
+Note the last `else` can be omitted:
+
+```{r eval = FALSE}
+GradeServiceScore <- function (score) {
+  if (score >=7) {
+    return("Satisfied")
+  } else if (score >= 4) {
+    return("Neutral")
+  }
+  #
+  return("Dissatisfied")
+}
+GradeServiceScore(10)
+GradeServiceScore(4.5)
+GradeServiceScore(-100)
+```
+
+
+### Revisit `IsLeapYear`
+
+Let's have a look back at our implementation of `IsLeapYear`:
+```{r eval = FALSE}
+IsLeapYear <- function (x) {
+    return (x %% 400 == 0 || (x %% 4 == 0 && x %% 100 != 0))
+}
+```
+The return value is dependent on the evaluation of these 3 conditions:
+ 
+ - `x %% 400 == 0`
+ - `x %% 4 == 0`
+ - `x %% 100 != 0`
+
+Instead of using logical operators (`&&`, `||`), we can use `if`, `else`, and `else if` statements to branch the code instead:
+```{r  eval = FALSE}
+# One of the following two implementations is incorrect. Can you spot the bug?
+
+IsLeapYear <- function (x) { # implementation A
+  if (x %% 400 == 0) {
+    return(TRUE)
+  } else if (x %% 4 == 0) {
+    if (x %% 100 != 0) {
+      return(TRUE)
+    } 
+  }
+  return(FALSE)
+}
+
+IsLeapYear <- function (x) { # implementation B
+  if (x %% 400 == 0) {
+    return(TRUE)
+  } else if (x %% 4 == 0) {
+    if (x %% 100 != 0) {
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  }
+}
+```
+
+> Question: What is the difference between these two implementations, and which one is better? How would you update our implementation of `DaysInYear` based on the same philosophy? 
+
+
+## Loops
+
+### `:`
+
+Before we start using loops, let's introduce the **colon operator `:`**. The colon operator is used to generate a regular sequence of numbers.
+
+```{r eval = TRUE, results = "hold"}
+1:5
+4.3:10.7
+10:4
+```
+
+### `for`
+
+> Example: Print all leap years between two given years.
+
+```{r eval = FALSE}
+PrintLeapYearsBetween <- function (from_year, to_year) {
+  for (year in from_year:to_year) {
+    if(IsLeapYear(year)) {
+      print(year)
+    }
+  }
+}
+PrintLeapYearsBetween(1990, 2018)
+```
+
+`?print` - prints its argument
+
+### `next`, `break`
+
+```{r eval = FALSE}
+PrintLeapYearsBetween <- function (from_year, to_year) {
+  for (year in from_year : to_year) {
+    if(!IsLeapYear(year)) {
+      next
+    }
+    print(year)
+  }
+}
+PrintLeapYearsBetween(1990, 2018)
+```
+
+```{r eval = FALSE}
+PrintNextLeapYear <- function (from_year) {
+  for (year in from_year : (from_year + 10)) { # search the next 10 years max
+    if(IsLeapYear(year)) {
+      print(year)
+      break
+    }
+  }
+}
+PrintNextLeapYear(1993)
+```
+
+### `while`
+
+> Example: Write a function that print a number (default 5) of leap years from a given year.
+
+```{r eval = FALSE}
+PrintNextLeapYears <- function(from_year, num_wanted = 5) {
+  num_printed <- 0
+  year <- from_year
+  while (num_printed < num_wanted) {
+    if (IsLeapYear(year)) {
+      print(year)
+      num_printed <- num_printed + 1
+    }
+    year <- year + 1
+  }
+}
+PrintNextLeapYears(1990)
+PrintNextLeapYears(1990, 3)
+```
+
+## Exception handling
+
+### `stop("mesg.")`
+
+```{r eval = FALSE}
+f <- function() g()
+g <- function() h()
+h <- function() stop("This is an error!")
+f()
+```
+
+ - `?stopifnot` - if any of the expressions is not TRUE, then `stop` is called.
+```{r eval = FALSE}
+a <- 5
+stopifnot(a < 10, "c" > "a", a^2 < 30)
+a <- 15
+stopifnot(a < 10, "c" > "a", a^2 < 30) # note the lazy evaluation
+```
+
+### `warning("mesg.")`
+
+```{r eval = FALSE}
+fw <- function() {
+  cat("1\n")
+  warning("W1")
+  cat("2\n")
+  warning("W2")
+  cat("3\n")
+  warning("W3")
+}
+fw()
+
+1
+2
+3
+Warning messages:
+1: In fw() : W1
+2: In fw() : W2
+3: In fw() : W3
+```
+
+### `message("mesg.")`
+
+```{r eval = FALSE}
+print("message printed")
+cat("message cat-ed\n")
+message("message message")
+```
+![Screenshot: different outputs from `print`, `cat`, and `message`](img/2_message_print_cat.png)
+
+You should use `print` and `cat` for messages that you, the writer of the code, want to read deliberately. `message` is for reminding the user, not the developer, that the program has done something. Logs of a web application is a good example of things better printed with `message`. After all, `message` is the brother of `stop` and `warning` to react and indicate the conditions of the system.
+
+
+## Exercises {-}
+
+See @sec-exercises-2 for more exercises on writing functions using control flows.
+

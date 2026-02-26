@@ -1,0 +1,209 @@
+---
+reference-location: margin
+---
+
+# File address system {#sec-file-address-sys}
+
+<!-- All files on your Hard Drive (HD) are organised (addressed) in a tree-like structure. There is a root to this tree which is simply your HD on which all of your files are stored. Nodes may stem from either the root of the tree, or other stems. A node that do not stem any more nodes are referred to as a leaf. -->
+
+When you organise an event, and you need to tell everyone where it is held, you have a choice to make:
+
+- Give the **full** address of the location, e.g. Meeting room 5, Big Data Institute, Old Road Campus, University of Oxford.
+- Give the location of the event **relatively** to a known location, e.g. Meeting Room 5, on the same floor as our office.
+
+This is the same when you refer to a file or a directory located on your computer's hard drive (HD). These two options are referred to as **absolute** (full) and **relative** paths of the target file or directory. **When it comes to a coding project, it is almost always preferable to use relative paths.**
+
+## Absolute path
+
+Every file and directory on your hard drive (HD) has its own address. For example, if you have a file named `child.csv` which is inside a **directory** (also referred to as a **folder**) named `parent` which is inside another directory named `grand_parent`, the parent of which is the root of your HD:
+
+```
+[root]
++-- grand_parent
+    +-- parent
+        +-- child.csv
+```
+
+Depending on which family of operating system(OS) you have, the address of `child.csv` may be written as:
+
+- On macOS (and other UNIX systems): `/grand_parent/parent/child.csv`
+- On Windows: `C:\grand_parent\parent\child.csv`
+
+Representing the full addresses of your file, these strings of characters are also referred to as the **absolute path**s of your file. Depending on which family of operating system (OS) you have on your computer, the address is formatted differently. Let's look at this more closely:
+
+1. The address always begin (from the left) with the **biggest identifiable unit** that contains the target file. This is the opposite to how you would write an address in real life (in the West). For example, you would write: "University Offices, Wellington Square, Oxford, OX1 2JD, United Kingdom" as the address on a letter addressed to the University of Oxford, starting with the smallest identifiable unit from the left.
+
+2. Since the file you are addressing for is somewhere on the HD of your computer, the address begins with the symbol that represents the **root** of your HD. On UNIX systems, this is the `/` character, and on Windows, this is the `C:\` character string.[^1] If we were to have an equivalent address for the University of Oxford, it probably would begin with `Earth` 🌍.
+
+3. As we look towards the end (right) of the address, there is a zoom-in process with the identifiable unit (the directories or folders) getting smaller and smaller until it gets to the file that you are addressing for. All these identifiable units need to be concatenated. We don't like having blank spaces in addresses, but we still need a way to separate the names of these units. This **separator** character is `/` on UNIX, and `\` on Windows.
+
+4. Given the definition of the separator characters, you might review our definition of the roots, and say that the root is `[nothing]` on UNIX, and `C:` on Windows, with the first `/` and `\` character in the string being the separator between the root and the first directory on the path.
+
+[^1]: With `C` indicating the `C` drive. And yes, there was at a time `A` and `B` drives too, and `D` drive (on the same HD) which went out of fashion not long ago.
+
+5. These examples are known as **absolute** paths, in that these paths begins (on its left) from the root directory and spell out absolutely everything that's along the way to your file.
+
+::: {.callout-tip}
+## Exercise
+When you browse the web, look at the address bar at the top of your browser. Each resource that's published on the internet also has an address. Ask yourself, what is the root and separator character in that address system?
+:::
+
+### Why you should not use absolute path in your code
+
+Along the whole string of characters on an absolute path, you have the names of all of the directories until you get to the file you want. The directory structure differs from machine to machine, and it is **very unlikely** that you would have identical directory structures on two machines.
+
+For example, Adam is working on a project that involves two files on his laptop:
+
+- `/Users/adam/Projects/big_project/data.csv`, a csv file that contains some data
+- `/Users/adam/Projects/big_project/process_data.r`, an R script that processes `data.csv`
+
+In `process_data.r`, he wrote the following to read the csv file:
+
+```r{#lst-r-script-1 lst-cap="process_data.r, works for Adam only"}
+file_to_read <- "/Users/adam/Projects/big_project/data.csv"
+df <- read.csv(file_to_read)
+```
+You can see that he specified the path of the file (in `file_to_read`) using the absolute path of `data.csv`. This script (`process_data.r`) works perfectly fine on Adam's machine.
+
+For the next step of the project he needs to send it to Eve who wants to extend the work. So Adam sends these two files (`data.csv` and `process_csv.r`) to Eve via email. Eve downloaded these two files from the email attachment to her laptop. On her laptop, the absolute paths of these two files are:
+
+- `/Users/eve/Downloads/data.csv`
+- `/Users/eve/Downloads/process_data.r`
+
+Now, Eve wants to run Adam's code (`process_data.r`, @lst-r-script-1) to see what it produces. Given what we know about the absolute path of `data.csv` on Eve's laptop in comparison to that on Adam's laptop, do you think the script would run correctly on Eve's machine?
+
+Of course not, because in Adam's code (@lst-r-script-1), the path of `data.csv` is given as `/Users/adam/Projects/big_project/data.csv` which does not exist on Eve's machine. On Eve's laptop, the absolute path of `data.csv` is `/Users/eve/Downloads/data.csv`.
+
+In order for the code to work, Eve will need to modify `process_data.r` (@lst-r-script-1) to be:
+
+```r{#lst-r-script-2 lst-cap="process_data.r, works for Eve only"}
+file_to_read <- "/Users/eve/Downloads/data.csv"
+df <- read.csv(file_to_read)
+```
+
+Don't under-estimate the negative impact of this extra step of work. Although the work involved is not technically complex or challenging, it creates a barrier between different collaborators of the project.
+
+{{< include ../_inc/def_collaborators.qmd >}}
+
+In this example, the script only requires one other file. That is far from reality. The workload increases dramatically as your project grows. What if Eve has extended the code and it now works with 10 csv files, and now she needs to pass the project back to Adam? What's the workload needed from Adam's end? 
+
+> Absolute paths are only likely to be valid on one machine, and that **it is a terrible idea to use absolute paths to specify file locations in a coding project**.
+
+::: {.callout-note collapse="false"}
+## The problematic part of the absolute path
+
+All the characters preceding `data.csv` are invalid on Eve's laptop. And this section of the absolute path can be seen as in two parts:
+
+1. The first part `/Users/adam` is written to comply with the setting of the OS. The OS has full control of the HD that it is installed on, and you as the user is only allowed to operate within a designated space on the HD, which in this case is `/Users/adam`.
+The first `/` refers to the root of the HD. The next directory name is `Users` because macOS saves all user files in that directory (@fig-macos_fs). Adam as the user has no control over this.
+
+![macOS file system @macOS_fs](img/mosx_fs_layout_2x.png){width=20% .lightbox #fig-macos_fs}
+
+::: {.callout-tip collapse="true"}
+## What's in the (local domain) Library directory?
+In @fig-macos_fs, note where the (local domain) `Library` directory is in relation to the other system directories. If you installed R or Python correctly on your macOS, then you should be able to find them in the following two directories:
+
+```
+/Library/Frameworks/R.framework
+/Library/Frameworks/Python.framework
+```
+:::
+
+Not only do we as the users not have control over the names of these OS-defined directory names, we also don't have control over what OS/settings the other users have on their machines. (The user has control over what username is used, but that's done only once when the user account is created by the OS for the user, and users are not expected to change this once it has been set up.)
+
+2. The next part of this absolute path (`/Projects/big_project`), is decided by the user Adam, and we cannot expect Eve to have the same habit of naming directories on her laptop.
+
+:::
+
+## Relative Path
+
+To avoid the issues that come with absolute paths, we need an alternative way to specify the location of a file/directory which is valid across machines. Essentially, we want to do ~~`/Users/adam/Projects/big_project/`~~`data.csv` ignoring everything that's outside the scope of the project. In fact, that's not too far from how relative paths are constructed:
+
+With `.` denoting the project's root directory, the relative path to `data.csv` which is equivalent to `/Users/adam/Projects/big_project/data.csv` in the context of the `big_project` project is:
+
+```./data.csv```
+
+The key here is the definition of `.`. Within the context of a project, `.` refers to the **current working directory** of the project which by default is the **root directory of the project**.
+
+Let's look at these concepts with our Adam and Eve example. Assuming that Adam and Eve are now working collaboratively on the `big_project` project with Adam taking the lead role. They both use macOS. Adam saves all his projects in a directory named `Projects`. Eve has moved everything out of the `Downloads` folder and has created a directory named `Others_projects` that contains projects that she works collaboratively with other people:
+
+::: {layout-ncol="2"}
+
+:::: {}
+
+**Adam's laptop**
+```
+/
++-- Users
+    +-- adam
+        +-- Projects
+            +-- big_project
+            |   +-- data.csv
+            |   +-- process_data.r
+            +-- another_project
+            |   +-- data
+            |   |   +-- log_day_1.csv
+            |   |   +-- log_day_2.csv
+            |   +-- main.r
+            |   +-- script_01.r
+
+```
+
+::::
+
+:::: {}
+
+**Eve's laptop**
+```
+/
++-- Users
+    +-- eve
+        +-- Downloads
+        +-- Others_projects
+            +-- big_project_adam
+            |   +-- data.csv
+            |   +-- process_data.r
+```
+::::
+
+:::
+
+On Adam's laptop, we see that he is working on two projects both of which are saved under his `Projects` directory. Each of the two directories (`big_project` and `another_project`) under the `Projects` directory contains files relevant to each of the two projects respectively, and therefore are the **root directories** of those two projects.
+
+On Eve's laptop, `big_project_adam` is the *root directory* of Eve's copy of Adam's `big_project` project.
+
+Orienting from the root directory of the `big_project` project, with **relative path**, instead of writing our address beginning from the root of the HD (i.e. `/`), we begin our address referring to the root directory of the project with a `.`. With this approach, `process_data.r` is written as:
+
+```r{#lst-r-script-3 lst-cap="process_data.r with relative path, works on both machines"}
+file_to_read <- "./data.csv"
+df <- read.csv(file_to_read)
+```
+
+Adam and Eve now have identical `process_data.r` that works on their own as well as each other's machines.
+
+::: {.callout-tip collapse="true"}
+## Same setting using absolute path.
+
+Using absolute path, Adam and Eve's copy of `process_data.r` would need to have different values assigned to the `file_to_read` variable:
+
+```r{#lst-r-script-3 lst-cap="process_data.r with absolute path on Adam's laptop"}
+file_to_read <- "/Users/adam/Projects/big_project/data.csv"
+df <- read.csv(file_to_read)
+```
+
+```r{#lst-r-script-3 lst-cap="process_data.r with absolute path on Eve's laptop"}
+file_to_read <- "/Users/eve/Others_projects/big_project_adam/data.csv"
+df <- read.csv(file_to_read)
+```
+:::
+
+## Next steps
+
+`.` denotes the **current working directory** which refers to the project's root directory in the context of a coding project by default. Compared to `/`, `.` is context-specific. Meaning that `.` is interpreted differently under different projects. You will learn more on how this works in R from @sec-working-dir.
+
+One other remaining issue with paths is the separator character which is different on different platforms. In R, we solve this issue with the `file.path` function. You will learn more on this from @sec-file.path.
+
+
+
+
+

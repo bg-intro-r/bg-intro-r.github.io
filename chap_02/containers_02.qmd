@@ -1,0 +1,184 @@
+# Heterogeneous Types
+
+## Lists
+
+`list`, `as.list`, `is.list`, `unlist`
+
+ - Atomic vectors are collections of values of the **same** type.
+ - Lists are collections of vectors and lists. The vectors within this collection may be of **any** type, and of **any** length.
+ - Lists are **recursive**, meaning a list can be an element of a list.
+
+
+::: column-margin
+![[image source](https://memegenerator.net/instance/85667543/inception-spinning-top-a-dream-within-a-dream-a-list-within-a-list)](img/3_recursive.png)
+::: 
+
+## Creation
+ 
+To create a list, we use the `list` function:
+
+```{r eval = FALSE}
+l1 <- list(    # l is a list of 3 elements
+  1:3,            # 1. an integer vector of length 3
+  "abc",          # 2. a character string vector of length 1
+  c(1.2, 3.8)     # 3. a double vector of length 2
+)
+l1
+typeof(l1)
+```
+
+A list can be an element of a list:
+```{r eval = FALSE}
+l2 <- list(    # l is a list of 2 elements
+  list(           # 1. a list of 2 elements
+    c(1, 2),           # 1.1 a double vector of length 2
+    list("w")          # 1.2 a list of 1 element (which is a char vector of length 1)
+  ),
+  "a"             # 2. a character vector of length 1
+)
+```
+
+
+The `c` function (implicitly) coerce vectors to lists of vectors before combining them into a list
+```{r eval = FALSE}
+l3 <- c(list(1, 2), c("3", "4"), list(5, 6))
+l3
+```
+
+![Illustration: list construction](img/3_list.png)
+
+Explicit coercion from other structures to lists is done via `as.list`. 
+```{r eval = FALSE}
+v <- c(1, 2, 3)
+# Are these two commands equivalent?
+list(v)
+as.list(v)
+```
+
+A list can be *flatten*-ed with `unlist`
+
+```{r eval = FALSE}
+v <- c(1, 2, 3)
+# Are these two commands equivalent?
+unlist(list(v))
+unlist(as.list(v))
+```
+
+
+## `names` attributes
+
+Like in vectors, you can add attributes such as `names` to lists
+
+```{r eval = FALSE}
+l <- list(
+  a = factor(c("apple", "apple", "banana")),
+  b = c(1:10)
+)
+typeof(l[["a"]])
+typeof(l)
+names(l)
+attributes(l)
+```
+
+One common usage of named lists is to return multiple values from a function:
+```{r eval = FALSE}
+# recall p1.3:
+Bmi <- function(weight, height) {
+  return(weight / height^2)
+}
+
+# now we want to know the value of bmi as well as if the bmi is showing a need to reduce weight:
+Bmi2 <- function(weight, height) {
+  bmi_value <- weight / height^2
+  return(list(
+    value = bmi_value,
+    reduce_weight = bmi_value >= 25
+  ))
+}
+bb <- Bmi2(weight = 90, height = 1.75)
+bb[["value"]]
+bb[["reduce_weight"]]
+```
+
+## `class` attribute
+The `class` attribute of a list determines how the list is printed, and which methods are used when we apply generic functions to the list. We will talk about generic functions and methods in [Object-oriented programming]. Examples of classes of lists include `data.frame`, `tibble`, `lm`, and `glm`:
+
+```{r eval = FALSE}
+df <- data.frame(x = 1:3, y = letters[1:3])
+tb <- tibble::tibble(x = 1:3, y = letters[1:3])
+lm1 <- lm(mpg ~ wt, data = mtcars)
+glm1 <- glm(vs ~ wt, data = mtcars, family = binomial)
+class(df)
+class(tb)
+class(lm1)
+class(glm1)
+```
+
+
+## `data.frame` and `tibble`
+
+`data.frame` and `tibble` are two classes of the list data structure used in R:
+
+ - `data.frame` - Data frames are tightly coupled collections of variables. Data frame is a fundamental data structure used by most of R's modelling functions.
+ - `tibble` - The data frames of `tidyverse`
+
+### `data.frame`
+
+A data frame is a named list of vectors with attributes `names`, `row.names`, and `class` of "data.frame". In contrast to regular lists, **all vectors inside the collection of a data frame are required to have the same length**. Thus a data frame is always rectangular shaped.
+
+Because data frame shares the same shape with matrix, the same functions applicable to matrix also work on data frame: `nrow`, `ncol`, `rownames`, `colnames`, `rbind`, `cbind`, `t`
+
+
+```{r eval = FALSE}
+df <- data.frame(x = 1:3, y = letters[1:3])
+df
+attributes(df)
+
+rownames(df)
+colnames(df)
+names(df)
+
+nrow(df)   # same as matrix
+ncol(df)
+length(df) # same as ncol
+
+t(df)
+
+rbind(df, df)
+cbind(df, df)
+```
+Noticed the column names are also duplicated? (See [Duplicated names])
+
+
+To prove data frames are just lists with fancy attributes, we manually construct a `data.frame` object by adding attributes to a list:
+
+```{r eval = FALSE}
+l <- list(x = 1:3, y = letters[1:3])
+attr(l, "class") <- "data.frame"
+attr(l, "row.names") <- 1:3
+identical(df, l)
+```
+
+Explicit coercion: `as.data.frame`
+
+```{r eval = FALSE}
+df1 <- as.data.frame(list(x = 1:3, y = letters[1:3]))
+identical(df, df1)
+is.data.frame(df1)
+```
+
+
+### `tibble`
+
+`tibble` is `tidyverse`'s version of data frame
+
+```{r eval = FALSE}
+library(tibble)
+tb <- tibble(x = 1:3, y = letters[1:3])
+typeof(tb)
+attributes(tb)
+
+is.data.frame(tb)
+```
+
+

@@ -1,0 +1,56 @@
+
+# Exercises 4 {-}
+
+## E4.1 `SumPrimes` {-}
+[Problem 10, Project Euler](https://projecteuler.net/problem=10): The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17. Find the sum of all the primes below two million. Use the [sieve of Eratosthenes](https://en.wikipedia.org/wiki/Sieve_of_Eratosthenes) algorithm.
+
+```{r eval = FALSE}
+SumPrimes <- function(max_value) {
+  # your code
+}
+SumPrimes(10)  # 17
+SumPrimes(2e6) # 142913828922
+```
+
+
+## E4.2 `data()` {-}
+How many datasets are available via the `data()` command?
+
+
+## E4.3 `VADeaths` {-}
+The `VADeaths` dataset that comes with R base records the death rates per 1000 in Virginia in 1940:
+
+  1. What is the average death rate in the 55-59 age group in 1940?
+  2. Which population group has the highest death rate in the 60-64 age group?
+
+
+## E4.4 `WorldPhones` {-}
+The `WorldPhones` dataset that comes with R base contains the number (in thousands) of telephones in various regions of the world:
+
+  1. What is the total number of phones in year 1961?
+  2. What is the year on year increase rate in phone usage in Asia from 1957 to 1958?
+  3. Where did the highest year on year increase happen from 1951 to 1961? and when?
+  4. Which year did Asia see the biggest increase rate in phone usage?
+
+
+## E4.5 `airquality` {-}
+The `airquality` dataset that comes with R base gives the daily air quality measurements in New York, from May to September 1973:
+
+  1. What is the average wind speed in New York in August 1973?
+  2. Is there any dates missing from this dataset? (Are all dates from May to September 1973 in this dataset?)
+  3. Which day in May had the highest solar radiation?
+  4. Which variable (each column contains values/observations of a variable) has the most number of missing values?
+
+
+## E4.6 `Indometh` {-}
+The `Indometh` dataset (built-in to R base) has 66 rows and 3 columns of data on the pharmacokinetics of indometacin of 6 subjects. Reshape it to a wide format.
+
+
+## E4.7 {-}
+A simulation was run for a period of 10 years. Each year is assumed to be 365 days ignoring leap years. A row of data is written to an output csv file for each day of the simulation. (i.e. the output file has 3650 rows of data) The days column of this csv is a sequence of ascending integers from `9126` to `12775`, with `9126` representing `2022-Jan-01`, `12775` representing `2031-Dec-31`. Our task now is to extract from this file, rows that represent the first day of each month, i.e. `2022-Jan-01`, `2022-Feb-01`, `2022-Mar-01`, ... `2031-Dec-01`. For this purpose we need to construct a logical vector `data_sel`.
+
+In the following script, let `data_days` represent the days column of the csv file.
+
+ 1. Construct a vector `data_sel` which is of equal length to `data_days` with `data_sel[ii]` indicate whether `data_days[ii]` should be selected (`data_sel[ii] == TRUE`) or not (`data_sel[ii] == FALSE`). (Try do this without using any `for` / `while` loops)
+ 2. Check that `data_sel` has 120 `TRUE` values, with all the rest being `FALSE`. How many ways (each using different functions) can you do this?
+

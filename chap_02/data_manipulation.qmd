@@ -1,0 +1,1055 @@
+# Data manipulation
+
+**Pre-requisites**
+
+ - `double`, `integer`, `character`, `logical`
+ - `c`, `length`, `typeof`
+ - `as.logical`, `as.integer`, `as.double`, `as.character`, `as.numeric`
+ - `is.atomic`, `is.logical`, `is.integer`, `is.double`, `is.character`, `is.numeric`
+ - `is.infinite`, `is.nan`, `is.na`, `is.null`
+ - `attr`, `names`, `setNames`, `[[]]`, `str`
+ - `matrix`, `t`, `diag`
+ - `dim`, `nrow`, `ncol`, `rownames`, `colnames`, `rbind`, `cbind`, `is.matrix`
+ - `array`, `is.array`
+ - `class`
+ - `factor`, `gl`, `as.factor`, `table`
+ - `as.Date`, `Sys.Date`
+ - `list`, `is.list`, `as.list`, `unlist`
+ - `apply`, `lapply`, `sapply`
+
+
+ - What is data manipulation / transformation
+ 
+![](img/4_data.png)
+
+ - Recall the data structures we introduced in the previous session:
+
+![data structures in R](img/4_data_structures.png)
+
+
+**Outline**
+
+- Extraction
+- Sequences
+- Sets
+- Search
+- Merge
+- Build-in datasets
+- Reshape
+- Aggregate
+- Sorting
+
+**Recommended readings:**
+
+- [Chapter 4, Advanced R, Hadley](https://adv-r.hadley.nz/subsetting.html)
+
+
+## Extraction
+
+Extraction, also known as "subsetting" or "indexing", is the first step of data manipulation. It refers to the step to specify a sub-section of the data structure to operate on.
+
+### Operators
+
+**`[`, `[[`, and `$`**
+
+Extraction operators act on vectors, matrices, arrays and lists to extract or replace parts of the data structure. Indexing can occur on the right-hand-side (RHS) of an expression for **extraction**, or on the left-hand-side (LHS) for **replacement**.
+
+ - There are three extraction operators, `[`, `[[`, and `$`. (see `?Extract`)
+ - `[` can select more than one element whereas the other two select a single element.
+ - `[` returns the same type
+ - Extraction operators interact differently with different data structure.
+ - For vector structures, we only need `[`.
+ - `[[` and `$` are only needed for list structures (recursive).
+ - `$` requires column names.
+ - Partial matching is the default behaviour of `$`, whereas `[[` applies exact matching by default.
+ - Values of different types may be used as indices.
+ 
+### `[`, `[[`
+
+#### from vectors
+
+**atomic vectors**
+
+```{r eval = FALSE}
+a <- c(11, 22, 33, 44, 55, 10)
+
+# different value types may be used as indices
+# 1. positive integers
+a[4]
+a[2:3]
+a[c(3, 1)]
+a[c(2, 2, 3)] # repeat the extracted element
+
+a[4.9]        # implicit coercion
+a[1.2:3.2]
+
+a[length(a)]  # last element
+
+# 2. negative integers
+a[-4]
+a[c(-4, -3)]
+a[-c(4, 3)]
+# a[c(-4, 3)]
+
+# 3. logical values
+a[c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE)] # selector vector is of same size
+a[c(TRUE, FALSE)] # selector vector is shorter than data vector
+a[c(TRUE, FALSE, FALSE, FALSE)]
+a[c(TRUE, FALSE, TRUE, FALSE, FALSE, FALSE, TRUE)] # selector vector longer than data vector
+a > 35
+a[a > 35]
+a[a > 20 & a < 50]
+
+a[c(FALSE, TRUE, NA)]
+
+# 4. empty
+a[]
+identical(a, a[]) # remember that [ is just a function?
+a[NULL]
+typeof(a[NULL])
+a[NA]
+
+# 5. zero
+a[0]
+a[c(0, 1)]
+
+# 6. characters
+b <- setNames(c(11, 22, 33), letters[1:3]) # named vector
+b["a"]
+b[c("a", "a", "c")]
+```
+
+`[[` is not very useful for vectors.
+
+```{r eval = FALSE}
+identical(a[[1]], a[1])
+a[[c(1,2)]] #?
+```
+
+
+**matrix**
+
+```{r eval = FALSE}
+m <- matrix(11:22, nrow = 4)
+m
+# single element
+m[2, 3]
+
+# multiple elements
+m[2:3, 3]   # vector
+m[2:3, 2:3] # matrix
+```
+
+Remember that matrices are just vectors with attributes, so you can index it with vectors. Note the difference a comma makes:
+
+```{r eval = FALSE}
+m[2:3]
+m[2:3,]
+
+m[2]
+m[2, ]
+```
+
+::: column-margin
+![[image source](http://blogs.chatham.edu/professionalwritingprogram/2017/06/29/lets-eat-grandma/)](img/4_comma.png)
+:::
+
+
+```{r eval = FALSE}
+# with logical vectors
+m[m > 5]
+
+# with names character
+colnames(m) <- c("col1", "col2", "col3")
+m[2, c("col1", "col3")]
+typeof(m[2, c("col1", "col3")])
+
+m[]
+identical(m, m[])
+```
+
+Again, `[[` is not very useful for matrices (which are vectors).
+
+```{r eval = FALSE}
+m[[1]]
+m[[1:2]] # ?
+```
+
+#### from lists
+
+**lists**
+
+```{r eval = FALSE}
+l <- list(1:5, letters[1:3], c(1.4, 3.1, 6.4, 6.2))
+l[1] # returns a list
+l[-1]
+l[2:3]
+identical(l[-1], l[2:3])
+l[1][2] # ?
+```
+
+To go deeper, use `[[`. (The clue is in the print.)
+
+```{r eval = FALSE}
+l[[1]]     # [[ lets you go one level deeper
+l[1]       # can you see the difference?
+
+l[[3]]
+l[[3:4]]   # don't do this
+l[3:4]     # this is what you wanted, probably
+```
+
+What about a list of lists?
+
+```{r eval = FALSE}
+ll <- list(list(11:14), list(21:24), list(31:34))
+ll[1]
+length(ll[1])
+ll[[1]]
+
+```
+
+![Each bag of pepper is a list. [image source](https://twitter.com/hadleywickham/status/643381054758363136/photo/1)](img/4_pepper.png)
+
+What about this? Can you point out where this is on the pepper photo?
+```{r eval = FALSE}
+ll[[1]][[1]][1]
+```
+
+**Data frame**
+
+```{r eval = FALSE}
+df <- data.frame(x = 1:10, y = letters[1:10])
+df
+df[1]      # data frame
+df[, 1]    # character vector (comma matters)
+df[1, ]    # data frame
+df[, 1:2]  # data frame
+
+df[3:5, ]  # data frame
+df[3:5, 2] # character vector
+
+df[, c("y", "x", "x")] # reorder columns in data frame
+df[, c("x", "x")]      # duplicate columns in data frame
+df[, c(2, 1, 1)]
+
+# What is the difference between these pairs of statements:
+df[2]
+df[[2]]
+
+df["y"]
+df[["y"]]
+
+df[c(TRUE, FALSE), ]
+df[, c(TRUE, FALSE)]
+df[c(TRUE, FALSE)]
+df[df[, "x"] > 5, ]
+
+df[df[, "x"] > 5, ]
+df[df[["x"]] > 5, ]
+
+```
+
+### `$`
+
+ - `$` is not valid for vectors
+ - `$` precedes column names of lists
+
+> `?Extract` - Both `[[` and `$` select a single element of the list. The main difference is that `$` does not allow computed indices (see [Dynamic name]), whereas `[[` does. `x$name` is equivalent to `x[["name", exact = FALSE]]`. Also, the partial matching behavior of `[[` can be controlled using the exact argument.
+
+```{r eval = FALSE}
+# $ is not useful for vectors
+m <- matrix(1:9, nrow = 3, ncol = 3)
+colnames(m) <- c("a", "b", "c")
+m
+m["a"]
+m[, "a"]
+m$"a"
+
+df <- data.frame(age = 1:10, initial = letters[1:10])
+
+df["age"]
+df[["age"]]
+df$age
+df$"age"
+df$`age`
+df$'age'
+
+df$a
+df$"a"
+df$'a'
+df$`a`
+
+df[["a"]]
+
+# what if both column names start with "a"
+df2 <- data.frame(age = 1:10, account = letters[1:10])
+
+df2$a
+df2$g
+df2$ag
+
+```
+
+### Dynamic name
+
+```{r eval = FALSE}
+df <- data.frame(age = 1:10, initial = letters[1:10])
+df$age # we know this works
+df$a   # this also works
+
+# What if the name of the wanted column is in a variable?
+wanted_col <- "a"
+df$wanted_col # would this work?
+# if it does, why does df$age work?
+
+df[[wanted_col]] # would this work?
+
+wanted_col <- "age"
+df[[wanted_col]] # feel better now?
+
+```
+
+
+Remember "**Everything that happens in R is a function call**". 
+
+```{r eval = FALSE}
+`$`(df, a)           # works
+`$`(df, "a")         # works
+`$`(df, wanted_col)  # doesn't work
+
+`[[`(df, wanted_col) # works
+`[[`(df, "age")      # works
+`[[`(df, age)        # doesn't work
+
+```
+
+
+Compare the comment for `$` and `[[`. How do they each handle the second argument?
+
+[R source code on `$`](https://github.com/wch/r-source/blob/trunk/src/main/subset.c#L1204-L1207):
+```
+/* The $ subset operator.
+   We need to be sure to only evaluate the first argument.
+   The second will be a symbol that needs to be matched, not evaluated.
+*/
+```
+
+[R source code on `[[`](https://github.com/wch/r-source/blob/87eebf48903a7dfa07f477cdb904eb83bb76510b/src/main/subset.c#L893-L894):
+```
+/* The [[ subset operator.  It needs to be fast. */
+/* The arguments to this call are evaluated on entry. */
+```
+
+### Duplicated names
+
+```{r eval = FALSE}
+df <- data.frame(x = 11:13, y = letters[11:13])
+rownames(df) <- c("r1", "r2", "r3")
+
+# double the rows
+df_rdbl <- rbind(df, df)
+df_rdbl
+rownames(df_rdbl) # row names are not duplicated
+
+# double the columns
+df_cdbl <- cbind(df, df)
+names(df_cdbl)    # column names are duplicated
+
+df3 <- df_cdbl[1, 1:4]
+names(df3)        # further operation distinguishes the duplicated columns
+
+duplicated(names(df_cdbl))
+df_cdbl[!duplicated(names(df_cdbl))] # extract only the not duplicated columns
+
+```
+
+> Type `?subset` and you will see that there is a built-in function called `subset` in R. Do you think we should include it in the lecture and why? 
+
+
+
+## Sequences
+
+From the previous section, we see that sequences of numbers are useful for specifying a section of a data structure. In this section, we take a look at different ways to generate sequences of values.
+
+### `:`
+
+The colon (`:`) operator is a quick way to generate a sequence of numbers. Recall that we also used it to control for loops:
+```{r eval = FALSE}
+IsLeapYear <- function (x) {
+    return (x %% 400 == 0 | (x %% 4 == 0 & x %% 100 != 0))
+}
+PrintLeapYearsBetween <- function (from_year, to_year) {
+  for (year in from_year : to_year) {
+    if(!IsLeapYear(year)) {
+      next
+    }
+    print(year)
+  }
+}
+PrintLeapYearsBetween(1990, 2018)
+```
+
+And that integers are the default type returned by `:`:
+
+```{r eval = FALSE}
+typeof(1:10) # the `:` operator generate a range of integer values
+```
+
+You can also generate a sequence of `double`s:
+
+```{r eval = FALSE}
+# 
+1.5:10
+1.5:10.5
+
+# note the difference
+typeof(1.5:10)
+typeof(1:10.5)
+
+# and implicit coercion happens
+a <- 11:20
+a[1.5:3.5]
+```
+
+What if we swap the bigger value to the LHS?
+
+```{r eval = FALSE}
+10:1
+10.6:-1.1
+```
+
+`:` returns a specific type of sequence of numbers that are 1 apart in numeric value. What if we want the interval to be more than 1?
+
+### `seq`
+
+```{r eval = FALSE}
+# well, you can always do this
+(1:10) * 2
+
+# but seriously, let's leave the maths to the computer
+# and do this in a safer manner with `seq`
+seq(from = 0, to = 20, by = 2)
+seq(from = 20, to = 0, by = 2) #?
+
+seq(from = 20.5, to = -5.30, by = -3)
+
+seq(from = 1.6, to = 2.8, length.out = 14)
+
+# sequence of length
+seq_len(10)
+
+```
+
+ - `seq` is a generalised version of `:`.
+ - `seq_along` is the preferred method where possible.
+
+---
+
+### `seq_along`
+
+It is common to want to iterate through a data structure and perform a set of operations on each of its elements with a for loop. In which case we need to define a sequence to represent the indices of that structure. There are many ways to generate this sequence and we give a comparison between these methods and demonstrate why `seq_along` is the safest way to generate this sequence.
+
+<span class="quote-emph">**`seq_along` is the function to use when you want to iterate a structure with a for loop**</span>
+
+```{r eval = FALSE}
+# Assuming v0, v1, v2, v3 are the vectors you want to iterate over
+v3 <- c(-11.1, -22.2, -33.3)
+v2 <- c(-11.1, -22.2)
+v1 <- c(-11.1)
+v0 <- c()
+
+# Three versions of looping over the vector
+print_all_seq_along <- function(vv) {
+  for (ii in seq_along(vv)) {
+    print(vv[ii])
+  }
+}
+
+print_all_seq <- function(vv) {
+  for (ii in seq(vv)) {
+    print(vv[ii])
+  }
+}
+
+print_all_length <- function(vv) {
+  for (ii in 1:length(vv)) {
+    print(vv[ii])
+  }
+}
+
+# when this vector of at least length 2
+print_all_seq_along(v3) # works
+print_all_seq(v3)       # works
+print_all_length(v3)    # works
+
+# vector is of length 1
+print_all_seq_along(v1) # works
+print_all_seq(v1)       # ?
+print_all_length(v1)    # works 
+
+# vector is empty
+print_all_seq_along(v0) # works
+print_all_seq(v0)       # works
+print_all_length(v0)    # ?
+
+
+```
+
+---
+
+### `rep`
+
+`rep` (replicate) is another useful function to generate sequences of certain patterns.
+
+```{r eval = FALSE}
+# replicate one value
+rep(TRUE, 10)
+# replicate a vector
+rep(1:4, 2)
+# replicate per element
+rep(1:4, each = 2)
+rep(1:4, c(2, 2, 2, 2))
+
+rep(1:4, c(4, 3, 2, 1))
+```
+
+### `expand.grid`
+
+Generate pairs of values from two sets of values, with all combinations of value pairs.
+
+```{r eval = FALSE}
+expand.grid(x = 1:5, y = 2:4)
+```
+
+---
+
+### Dates
+
+To create a sequence of dates
+
+```{r eval = FALSE}
+# know the start date and the length of the sequence
+d <- as.Date("2020-02-25", format = "%Y-%m-%d")
+d + 1:5
+
+# know start date and end date
+d1 <- as.Date("2020-02-25", format = "%Y-%m-%d")
+d2 <- as.Date("2020-03-25", format = "%Y-%m-%d")
+d1 + 1:(d2 - d1)
+
+# with seq
+seq(d1, d2, by = "days")
+seq(d1, d2, by = "2 days")
+seq(d1, d2 + 365 * 3, by = "years")
+seq(d1, d2 + 365 * 3, by = "quarter")
+
+```
+
+It is worth noting the [`lubridate`](https://rawgit.com/rstudio/cheatsheets/master/lubridate.pdf) package which provides a more intuitive way to define dates and times.
+
+```{r eval = FALSE}
+library(lubridate)
+seq(ymd("2020-02-25"), ymd("2020-03-25"), by = "2 days")
+```
+
+---
+
+### Random sequences
+
+#### `runif` and `rnorm`
+
+ - `runif(n, min = 0, max = 1)`, get `n` random numbers **uniformly-distributed** between `min` and `max` (`runif` will not generate either of the extreme values unless max == min or max-min is small compared to min)
+ - `rnorm(n, mean = 0, sd = 1)`, get `n` random numbers **normally-distributed** around `mean`
+ 
+```{r eval = FALSE}
+runif(10) # 10 random numbers between `0` and `1`
+```
+
+```{r fig.asp = 1}
+n <- 1000
+plot(x = runif(n), y = rnorm(n), pch = 20)
+```
+
+#### Reproducibility
+
+**seed** - `?.Random.seed`
+
+```{r eval = FALSE}
+set.seed(1); runif(10)
+set.seed(1); runif(10) # reset seed and same sequence of random number is generated 
+```
+
+#### Distributions
+
+Details of these functions will be covered in the Mathematics and Statistics module later in the term.
+
+| Distribution | Random numbers  | Probability density function (PDF) | Cumulative Distribution function (CDF) | Quantile function |
+| :------ |:-------:| :-------: | :-------: | :-------: |
+| Uniform | `runif` | `dunif` | `punif` | `qunif` |
+| Normal  | `rnorm` | `dnorm` | `pnorm` | `qnorm` |
+| Poisson  | `rpois` | `dpois` | `ppois` | `qpois` |
+| Binomial  | `rbinom` | `dbinom` | `pbinom` | `qbinom` |
+| Exponential  | `rexp` | `dexp` | `pexp` | `qexp` |
+| Gamma  | `rgamma` | `dgamma` | `pgamma` | `qgamma` |
+
+See `?Distributions` for more details.
+
+![Probability distributions[image source](http://commons.apache.org/proper/commons-math/userguide/distribution.html)](img/8_distributions.png)
+
+## Sets
+
+In this section, we take a look at when two groups of values are involved in the operation.
+
+**Basic set operations**
+
+A key property of sets, as compared to vectors, is that it does not contain duplicated values. R has a set of functions to perform basic set operations.
+
+> `?union` - Performs set union, intersection, (asymmetric!) difference, equality and membership on two vectors. Each of `union`, `intersect`, `setdiff` and `setequal` will discard any duplicated values in the arguments, and they apply `as.vector` to their arguments (and so in particular coerce factors to character vectors).
+
+Illustrated below are two sets `s1` and `s2`. Each set has 5 elements. Both sets contain numbers 3, 4, and 5.
+
+![](img/4_sets.png)
+
+```{r eval = FALSE}
+s1 <- 1:5
+s2 <- 3:7
+
+union(s1, s2)
+intersect(s1, s2)
+setdiff(s1, s2)
+setdiff(s2, s1)
+
+setequal(1:5, 5:1)
+setequal(c(1, 2, 2, 3), c(3, 3, 2, 1, 1))
+
+is.element(5, s1)
+is.element(c(1, 3, 7), s1)
+```
+
+---
+
+## Search
+
+Let's take a closer look at `intersect`. (Typing the function name on the console returns the implementation of the function, just like a variable).
+
+```{r eval = TRUE}
+intersect
+```
+
+We see two other functions `unique` and `match` are used to achieve `intersect`.
+
+### `unique`, `duplicated`
+
+> `?unique` - returns a vector, data frame or array like the input but with duplicate elements/rows removed.
+
+> `?duplicated` - determines which elements of a vector or data frame are duplicates of elements with smaller subscripts, and returns a logical vector indicating which elements (rows) are duplicates.
+
+```{r eval = FALSE}
+unique(c(NA, 1, 1, 10, NULL, NaN, NaN))
+
+x <- c(4, 1:5, 3:6)
+duplicated(x)
+duplicated(x, fromLast = TRUE)
+
+duplicated(c(NA, 1, NA, NaN, NaN, NULL, NULL))
+
+# multiple columns
+df <- data.frame(c(1, 2, 1, 4, 2, 2), c(2, 3, 2, 6, 2, 3))
+df
+duplicated(df[,1:2])
+
+anyDuplicated(df[,1:2])
+```
+
+### `match`, `%in%`
+
+```{r eval = FALSE}
+match(c(1, NA, 10), c(1:4, NA, NaN))
+```
+
+`match` is similar to `is.element`.
+
+```{r eval = FALSE}
+match(3, 1:10)
+is.element(3, 1:10)
+
+# the %in% operator is identical to `is.element`.
+# `?match` - `%in%` is a more intuitive interface as a binary operator, which returns a logical vector indicating if there is a match or not for its left operand.
+3 %in% 1:10
+9:11 %in% 1:10
+```
+
+### `any`, `all`
+
+`any` and `all` search for `TRUE` values in the given structure, and they can be used to summarise the result from `is.element` or `%in%`
+
+```{r eval = FALSE}
+s1 <- 1:5
+s2 <- 3:7
+
+any(is.element(s1, s2))
+all(is.element(s1, s2))
+
+any(c(1, "a", "bc") %in% letters)
+any(c(1, "a", "bc") %in% LETTERS)
+all(c(1, "a", "bc") %in% letters)
+```
+
+### `which`, `arrayInd`
+
+`which` is similar to `match`, but the condition is not restricted to equality:
+
+```{r eval = FALSE}
+which(LETTERS == "E")
+which(1:10 > 3)
+
+v <- c(5, 3, 5, 2, 7)
+
+which.min(v)
+which.max(v)
+
+# ?which.min - If this extremum is unique (or empty), the results are the same as (but more efficient than)
+#              which(x == min(x, na.rm = TRUE)) or which(x == max(x, na.rm = TRUE)) respectively.
+
+# what happens when the min / max is not unique?
+which.min(c(v, 2))
+which.max(c(7, v))
+
+# what about matrices
+m <- matrix(1:15, nrow = 3, ncol = 5)
+which.max(m)
+# how to get the indecies?
+# 1. with which
+which(m == max(m), arr.ind = TRUE)
+# 2. with arrayInd
+arrayInd(which.max(m), dim(m))
+
+```
+
+### `sample`
+
+```{r eval = FALSE}
+sample(1:10, size = 3)
+sample(1:10, size = 10)
+sample(1:10, size = 11) #?
+sample(1:10, size = 20, replace = TRUE)
+```
+
+## Merge
+
+**Lookup**
+
+One of the most frequently used functions in Excel is the `vlookup` function.
+
+![](img/4_vlookup.png)
+
+How do we do this in R?
+
+### Lookup
+
+```{r eval = FALSE}
+# example with vectors
+x <- c("m", "f", "u", "f", "f", "m", "m", "")
+lookup <- c(m = "Male", f = "Female", u = NA)
+lookup[x]
+
+# example with data frame
+df <- data.frame(
+  name = c(
+    "robert", "catelyn", "theon", "cersei", "sansa",
+    "ned", "jaime", "sandor", "arya", "tyrion"
+  ),
+  gender = c(
+    "m", "f", "u", "f", "f",
+    "m", "m",  "", "f", "m"
+  )
+)
+lookup[df[["gender"]]]
+df_res <- df
+df_res[["gender_formatted"]] <- lookup[df[["gender"]]]
+df_res
+```
+
+### `match`
+```{r eval = FALSE}
+df1 <- data.frame(
+  birth_house = c(
+    "baratheon", "stark", "stark", "stark", "stark",
+    "lannister", "lannister", "lannister", "greyjoy", "clegane"
+  ),
+  name = c(
+    "robert", "catelyn", "sansa", "ned", "arya",
+    "cersei", "jaime", "tyrion", "theon", "sandor"
+  )
+)
+match(df$name, df1$name)
+df_res <- df
+df_res[["birth_house"]] <- df1[match(df$name, df1$name), "birth_house"]
+df_res
+```
+
+### `merge`
+
+```{r eval = FALSE}
+df3 <- merge(df, df1, by = "name")
+df3
+merge(df, df1)
+```
+
+```{r eval = FALSE}
+
+```
+
+## Built-in datasets
+
+Base R comes with a few datasets built-in for demonstration purposes. We will use some of these to demonstrate how some of the data manipulation functions work.
+
+```{r eval = FALSE}
+data() # displays a list of all datasets
+```
+
+### `head`, `tail`, `summary`
+
+Quite often, the datasets are very long to read on one or even several screens. `head` and `tail` (as the identically named Linux/Unix commands) prints the beginning and end of the dataset.
+
+```{r eval = FALSE}
+morley
+head(morley)
+tail(morley)
+summary(morley)
+dim(morley)
+```
+
+## Reshape
+
+> `?morley`: Michelson Speed of Light Data, A classical data of Michelson (but not this one with Morley) on measurements done in 1879 on the speed of light. The data consists of five experiments, each consisting of 20 consecutive ‘runs’. The response is the speed of light measurement, suitably coded (km/sec, with 299000 subtracted).
+
+There are many ways to reshape data between long and wide format:
+
+ - `reshape`, R base
+ - `gather` and `spread`, part of the `tidyr` package
+ - `melt` and `dcast`, part of the `reshape2` package
+ - `stack` and `unstack`, R base
+ 
+We give introduction to the solution with the first two options.
+
+### `reshape`
+
+ - `reshape` is part of R base.
+
+```{r eval = FALSE}
+morley_wide <- reshape(morley, idvar = c("Expt"), timevar = "Run", v.names = "Speed", direction = "wide", sep = "_")
+#morley_wide <- reshape(morley, idvar = c("Expt"), timevar = "Run", v.names = c("Speed", "Run"), direction = "wide", sep = "_Run")
+morley_wide
+attributes(morley_wide)
+morley_long <- reshape(morley_wide, idvar = c("Expt"), direction = "long")
+morley_long
+
+attributes(morley_wide)$reshapeWide <- NULL
+morley_long <- reshape(morley_wide, idvar = c("Expt"), direction = "long") # no 'reshapeWide' attribute, must specify 'varying'
+morley_long <- reshape(morley_wide, idvar = c("Expt"), direction = "long", varying = 2:ncol(morley_wide), v.names = "Speed")
+morley_long <- reshape(morley_wide, idvar = c("Expt"), direction = "long", varying = 2:ncol(morley_wide), timevar = "Run", v.names = "Speed")
+morley_long
+
+```
+
+### `tidyr`
+
+ - `gather` and `spread` are part of the `tidyr`
+ 
+```{r eval = FALSE}
+morley_wide <- tidyr::spread(morley, key = Run, value = Speed)
+morley_wide <- tidyr::pivot_wider(morley, names_from = Run, values_from = Speed)
+morley_wide
+
+
+morley_long <- tidyr::gather(morley_wide, key = Run, value = Speed, names(morley_wide)[-1])
+morley_long <- tidyr::pivot_longer(morley_wide, names_to = "Run", values_to = "Speed", -Expt)
+morley_long
+
+```
+
+```{r eval = FALSE}
+ag <- aggregate(morley$Speed, by = morley[1], FUN = quantile, probs = c(0.99, 0.95, 0.75))
+head(ag)
+colnames(ag)
+
+
+m <- matrix(c(1,2,3,4), nrow=2, ncol=2)
+df <- data.frame(id=1, mat=I(m))
+```
+
+
+## Aggregate
+
+### `aggregate`
+
+```{r eval = FALSE}
+dtf <- data.frame(
+  p1 = rep(1:2, 4:5),
+  p2 = rep(letters[2:3], 5:4),
+  v1 = rnorm(9, mean = 10),
+  v2 = rnorm(9, mean = 20)
+)
+dtf
+
+aggregate(dtf$v1, by = list(p1 = dtf$p1, p2 = dtf$p2), FUN = mean)
+aggregate(dtf[, 3:4], by = list(p1 = dtf$p1, p2 = dtf$p2), FUN = mean)
+
+```
+
+ - Formula method of aggregate
+
+```{r eval = FALSE}
+# one value grouped by one variable
+aggregate( v1 ~ p1, data = dtf, mean)
+aggregate( p2 ~ p1, data = dtf, length)
+
+# multiple values grouped by one variable
+aggregate(cbind(v1, v2) ~ p1, data = dtf, max)
+
+# one value grouped by multiple variables
+aggregate(v1 ~ p1 + p2, data = dtf, min)
+
+# multiple values grouped by multiple variables
+aggregate(cbind(v1, v2) ~ p1 + p2, data = dtf, mean)
+aggregate(. ~ p1 + p2, data = dtf, mean)
+
+```
+
+ - with `dplyr`
+
+```{r eval = FALSE}
+dtf2 <- dplyr::group_by(dtf, p1, p2)
+dplyr::summarise(dtf2, v1.avg = mean(v1), v2.max = max(v2))
+dplyr::summarise(dtf2, quantile(v1, c(0.01, 0.5)))
+
+my_quantile <- function(x, probs) {
+  # dplyr::tibble(x = quantile(x, probs), probs = probs)
+  data.frame(x = quantile(x, probs), probs = probs)
+}
+dplyr::summarise(dtf2, my_quantile(v1, c(0.01, 0.5)))
+
+?dplyr::summarise_each #deprecated 
+
+# 
+# aggregate(df3, by = list(df3$birth_house), FUN = length)
+# aggregate(df3$name, by = list(df3$birth_house), FUN = length)
+# aggregate(df3, by = list(df3$birth_house, df3$gender), FUN = length)
+
+```
+
+### Basic stats functions
+
+Here are some R functions for basic descriptive statistic operations.
+
+```{r eval = FALSE}
+mean(1:10)             # mean
+mean(c(1:10, NA, NaN)) # mean
+mean(c(1:10, NA, NaN), na.rm = TRUE) # mean
+
+sd(1:10)     # standard deviation
+var(1:10)    # variance
+median(1:10) # median
+
+# ?median - The default method returns a length-one object of the same type as x,
+#           except when x is logical or integer of even length, when the result will be double.
+median(c(1, 2, 2, 10))
+
+quantile(1:100, probs = c(0.05, 0.95))
+quantile(1:100, probs = c(0, 1))
+range(1:100)
+
+v <- c(1, 3, 8, 2, NA, NaN)
+
+min(v)
+min(v, na.rm = TRUE)
+max(v)
+max(v, na.rm = TRUE)
+max(c(v, Inf), na.rm = TRUE)
+
+which.min(v) # na.rm = TRUE by default
+which.max(v) # na.rm = TRUE by default
+
+# ?which.min - If this extremum is unique (or empty), the results are the same as (but more efficient than)
+#              which(x == min(x, na.rm = TRUE)) or which(x == max(x, na.rm = TRUE)) respectively.
+
+sum(1:100)
+
+diff(c(1, 3, 5, 2, 10))
+diff(c(1, 3, 5, 2, 10), lag = 3)
+
+# cumulatives
+cumsum(c(1, 3, 5, 2, 10))
+cumprod(c(1, 3, 5, 2, 10))
+cummax(c(1, 3, 5, 2, 10))
+cummin(c(1, 3, 5, 2, 10))
+cummin(c(10, 3, 5, 2, 10))
+
+```
+
+
+### Expand
+
+```{r eval = FALSE}
+# n gives the aggregated counts of x, y pairs
+df <- data.frame(x = c(2, 4, 1), y = c(9, 11, 6), n = c(3, 5, 1))
+rep(1:nrow(df), df[["n"]])
+
+df[rep(1:nrow(df), df[["n"]]), ]
+
+```
+
+---
+
+## Sorting
+
+`sort(x, decreasing = FALSE, ...)` sort a vector or factor into ascending or descending order.
+
+```{r eval = FALSE}
+v <- c(NA, 10, 8, 4, 4, NaN, NULL, 7, 13)
+sort(v)
+sort(v, decreasing = TRUE)
+```
+
+`order` returns a permutation which rearranges its argument into ascending or descending order.
+
+```{r eval = FALSE}
+v <- c(NA, 10, 8, 4, 4, NaN, NULL, 7, 13)
+order(v)
+v[order(v)]
+v[order(v, decreasing = TRUE)]
+
+
+df <- data.frame(
+  name  = letters[1:8],
+  age   = c(25,  25, 25,  20, 20,  15, 47, 33),
+  score = c(97, 100, 90, 100, 95, 100, 90, 90)
+)
+df
+df[order(df[["age"]]),]
+df[order(df[["age"]], -df[["score"]]),]
+
+```
+
+Sorting methods `method = c("auto", "shell", "quick", "radix")` can be specified for both `sort` and `order`.
+
+
+- Reorder columns
+
+```{r eval = FALSE}
+df <- data.frame(x = 1:3, y = 3:5)
+df
+df <- df[, c("y", "x")]
+df <- df[, c(2, 2, 1)]
+df
+```
+
+---
+
+## Exercises {-}
+
+See @sec-exercises-4 for exercises on usages of `data.frame`.
+
+

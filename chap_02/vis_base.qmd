@@ -1,0 +1,515 @@
+# Data Visualisation I
+
+> [What is R?](https://www.r-project.org/about.html) - R is a language and environment for statistical computing and **graphics**.
+
+Data visualisation serves two purposes:
+
+ - **Discovery** (This session)
+ - Presentation (next session)
+
+**Recommended readings**
+
+- Formulae for statistical models
+  - [Chapter 11, Statistical models in R](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Formulae-for-statistical-models)
+- Base R graphics
+  - [Chapter 12, Graphical procedures, An Introduction to R](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Graphics)
+- Better graphics
+  - [Ten Simple Rules for Better Figures](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1003833)
+  - https://github.com/rougier/ten-rules
+  - http://blogs.nature.com/methagora/2013/07/data-visualization-points-of-view.html
+
+ 
+## Anscombe's quartet
+
+Among the many datasets included in R, there is one named `anscombe`. This dataset comes from the journal article authored by the F. J. Anscombe published on The American Statistician journal in 1973, titled [Graphs in Statistical Analysis](https://www.jstor.org/stable/2682899?origin=crossref&seq=1#metadata_info_tab_contents).
+
+There are eight columns in `anscombe` giving four pairs of `x` and `y` values:
+
+ - `(x1, y1)`
+ - `(x2, y2)`
+ - `(x3, y3)`
+ - `(x4, y4)`
+
+Let's take a look at some of the descriptive statistics of the dataset:
+
+```{r eval = TRUE}
+head(anscombe)
+attributes(anscombe)
+summary(anscombe)
+
+sapply(anscombe, var)    # variance
+sapply(anscombe, median) # median
+
+# correlation
+cor(anscombe[["x1"]], anscombe[["y1"]])
+cor(anscombe[["x2"]], anscombe[["y2"]])
+cor(anscombe[["x3"]], anscombe[["y3"]])
+cor(anscombe[["x4"]], anscombe[["y4"]])
+```
+
+The four sets of x-y pairs don't seem to be different according to the statistical values. So we should expect to see four very similar shapes once they are plotted:
+
+```{r eval = TRUE}
+#?anscombe
+# PAR_DEFAULTS <- par(no.readonly = TRUE)
+
+ff <- y ~ x
+par(mfrow = c(2, 2), mar = 0.1 + c(4, 4, 1, 1), oma =  c(0, 0, 2, 0))
+for(i in 1:4) {
+  ff[2:3] <- lapply(paste0(c("y", "x"), i), as.name)
+  plot(ff, data = anscombe, col = "red", pch = 21, bg = "orange", cex = 1.2,
+       xlim = c(3, 19), ylim = c(3, 13))
+}
+mtext("Anscombe's quartet", outer = TRUE, cex = 1.5)
+# par(PAR_DEFAULTS)
+```
+
+This dataset, published in 1973, demonstrates the importance of data visualisation. **<span class="quote-emph">Graphics is not only useful for presenting results, but also for data analysis and discovery</span>**.
+
+ - Original publication: [F. J. Anscombe, Graphs in Statistical Analysis. *The American Statistician*](https://www.jstor.org/stable/2682899?origin=crossref&seq=1#metadata_info_tab_contents)
+ - Wiki: [Anscombe's quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet)
+ - [Datasaurus](http://www.thefunctionalart.com/2016/08/download-datasaurus-never-trust-summary.html) is a modern iteration of Anscombe's quartet.
+
+
+## Formulae, `y ~ x`
+
+> `?formula` - An expression of the form `y ~ model` is interpreted as a specification that the response `y` is modelled by a linear predictor specified symbolically by model.
+
+Familiarity with statistical concepts and terms is needed to understand formulae definition in R. We will talk about statistical models in the following sessions, but more details will be given in the Statistics module later in the term. We give brief introduction in this session, which is sufficient for the purpose of this module.
+
+Suppose `x1` and `x2` are independent variables, `y` is the response / dependent variable, a formula `fm` may be defined as follows:
+
+```{r eval = FALSE}
+fm <- y ~ x1 + x2 # y is a function of x1 and x2
+terms(fm)
+typeof(fm)
+class(fm)
+attributes(fm)
+str(fm)
+length(fm)
+fm[[1]]
+fm[[2]]
+fm[[3]]
+
+#fm <- ~ x1 + x2 # one-sided formula
+
+```
+
+
+ - Formula expresses a relationship between variables
+ - `~`, tilde is used to separate the left- and right-hand sides in a model formula
+ - LHS of `~` are the dependent variable (a.k.a response, outcome, label)
+ - RHS of `~` are the independent variables (a.k.a predictor, controlled variable, feature)
+
+---
+
+ - `+`, join variables
+ - `-`, remove variable
+ - `*`, crossing
+ - `%in%`, nesting
+ - `^`, to the specified degree
+ - `.`, all other variables that have not been included in the formula
+ - `poly(x, degree = d)`, the orthogonal polynomials of degree `d` over `x`
+ - `I(x)`, `x` is treated `as is`, i.e. `poly(x, 2)` is equivalent to `1 + x + I(x^2)`
+ 
+
+```{r eval = FALSE}
+fm <- as.formula("y ~ x1 + x2") # string to formula
+typeof(fm)
+terms(fm)
+all.vars(fm)
+
+fm <- update(fm, ~. + x3)
+fm
+
+fm <- y ~ x + I(x^2)  # I(), as-is operator
+fm
+```
+
+
+## Base R graphics
+
+Part of base R is the `graphics` package (`?graphics`) which contains functions for `base` graphics. The graphic functions are divided into three groups:
+
+- **High-level commands** - create a new plot
+  - `plot`
+  - `barplot`
+  - `hist`
+  - `curve`
+  - `coplot`
+  - ...
+
+- **Low-level commands** - add information / graphics to existing plot
+  - `points`
+  - `lines`
+  - `text`
+  - `abline`
+  - `polygon`
+  - `arrows`
+  - `legend`
+  - `title(main, sub)`
+  - `axis`
+  - ...
+
+- **Interactive** - reactive to mouse clicks on the graph
+  - `locator`
+  - `identify`
+
+These commands are all well documented, e.g. `?curve`. In this session, we give a few example of commonly used plotting commands.
+
+To list the functions available in `graphics` package:
+
+- `ls("package:graphics")`
+- `lsf.str("package:graphics")`
+
+
+### High-level commands
+
+#### `plot`
+
+```{r}
+# Plot three data points
+plot(x = c(1, 2, 3), y = c(2, 5, 4))
+```
+
+We use built-in dataset `cars` which contains data for two variables:
+```{r}
+summary(cars)
+```
+
+The simplest form:
+
+```{r eval = TRUE}
+plot(cars)
+```
+
+
+```{r eval = FALSE}
+# as long as the data is in matrix form
+plot(as.matrix(cars)) # matrix works just fine
+
+# specify the columns in formula form
+plot(dist ~ speed, data = cars)
+
+# specify xy values by vector
+plot(x = cars$dist, y = cars$speed)
+# - the axes are swapped
+# - axis labels
+```
+
+Now let's play spot the difference:
+
+
+```{r fig1, fig.asp=1.3}
+#PAR_DEFAULTS <- par(no.readonly = TRUE)
+
+par(mfrow = c(2, 1))
+plot(cars) # top plot
+plot(      # bottom plot
+  cars$dist ~ cars$speed, type = "b",
+  main = "cars dataset", xlab = "Speed (mph)", ylab = "Stopping distance (ft)",
+  xlim = c(30, 0), ylim = c(0, 140), pch = 16, lty = "dashed", col = "blue",
+  xaxs = "i", yaxs = "i"
+)
+```
+
+
+- `col`, to get all colour names, run either
+  - `showCols1()`
+  - `demo("colors")`
+
+
+- `type` can be the followings:
+
+   - `p` for points
+   - `l` for lines
+   - `b` for both points and lines
+   - `c` for empty points joined by lines
+   - `o` for overplotted points and lines
+   - `s` and "S" for stair steps
+   - `h` for histogram-like vertical lines
+   - `n` does not produce any points or lines
+
+
+#### `barplot`
+
+
+```{r}
+dta <- c("red" = 10, "black" = 13, "silver" = 20, "yellow" = 4)
+barplot(dta)
+```
+
+Ideal for plotting result of `table`:
+
+```{r}
+barplot(
+  table(c("banana", "apple", "coconut", "apple", "apple", "banana", "banana", "banana")),
+  horiz = TRUE
+)
+```
+
+- Values can be stacked
+
+```{r}
+barplot(cbind(Employed, Unemployed) ~ Year, data = longley)
+```
+
+
+```{r}
+barplot(height = 1:10, names = letters[1:10])
+```
+
+#### `hist`
+
+```{r}
+hist(1:10) # Compare this to the figure produced by `barplot`
+```
+
+A `table` command is implied in `hist`
+
+```{r fig.asp = 1}
+dta <- c(1, 1, 2, 2, 3, 3, 3, 4, 5, 6, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9)
+par(mfrow = c(3, 1))
+hist(x = dta)
+hist(x = dta, breaks = c(0, 1, 2, 3, 5, 8, 9)) # note the change in y label
+hist(x = dta, breaks = 2)
+```
+
+- Not so reliable when the size of data is small
+- Good for representing distribution
+
+```{r fig.asp = 1.3}
+n <- 10000
+par(mfrow = c(3, 1))
+hist(rnorm(n), breaks = 40)
+hist(runif(n), breaks = 40)
+
+d <- density(rnorm(n))
+plot(d)
+```
+
+#### `stripchart`
+
+- `stripchart` treats each column of data as measurements of one variable.
+
+```{r}
+stripchart(1:10)
+```
+
+- Use `jitter` to distinguish overlapping points
+
+```{r}
+dta <- rnorm(100)
+par(mfrow = c(2, 1), mar = c(2, 2, 1, 1))
+stripchart(dta, pch = 20)
+stripchart(dta, method = "jitter", pch = 20)
+```
+
+ - A strip is created for each variable (column) in the dataset:
+
+```{r fig.width=5, fig.asp = 1}
+set.seed(1)
+n <- 500
+dtf <- data.frame(
+  normal = rnorm(n),
+  uniform = runif(n, min = -1, max = 1)
+)
+stripchart(
+  dtf,
+  at = c(1, 2), xlim = c(0.5, 2.5), ylim = c(-3, 3),
+  method = "jitter", pch = 20,
+  group.names = c("Normal", "Uniform"), xlab = "Distribution", ylab = "Value",
+  vertical = TRUE,
+  col = c("blue", "red")
+)
+abline(h = c(-1, 1), lty = "dashed")
+
+```
+
+#### `boxplot`
+
+ - Descriptive statistics of data
+ - Good for big datasets
+
+```{r fig.width=5, fig.asp = 1}
+boxplot(dtf) # compare this with stripchart
+# abline(h = c(-1, 1), lty = "dashed")
+```
+
+- Quantiles isn't everything, don't rely on boxplots
+
+```{r}
+boxplot(anscombe)
+```
+
+
+#### `pairs`
+
+ - Correlation between pairs of variables
+
+```{r}
+pairs(swiss, panel = panel.smooth, pch = ".") 
+```
+
+
+#### `coplot`
+
+ - Multiple variables involved
+ - Focus on correlation between two variables
+
+```{r}
+coplot(conc ~ Time | Subject, data = Theoph, show.given = FALSE)
+```
+
+```{r}
+# coplot(lat ~ long | depth * mag, data = quakes)
+```
+
+#### `matplot`
+
+ - `matplot`, plot columns of matrices
+
+```{r}
+n <- 20
+ld <- c(3, 5, 8, 10)
+dta <- data.frame(
+  "a" = cumsum(rpois(n, lambda = ld[1])),
+  "b" = cumsum(rpois(n, lambda = ld[2])),
+  "c" = cumsum(rpois(n, lambda = ld[3])),
+  "d" = cumsum(rpois(n, lambda = ld[4]))
+)
+matplot(dta, type = "o", pch = names(dta))
+```
+
+
+#### `dotchart`
+
+ - number of values to be plotted are tenable
+ - all values are numeric from a range
+ - all values are to be compared
+ - both column and row names are important
+
+```{r}
+dotchart(c("a" = 1:3, "b" = 4:6))
+```
+
+ - with row name
+
+```{r}
+dotchart(VADeaths)
+# dotchart(mtcars)
+```
+
+#### `curve`
+
+ - Plot value of a function over an interval
+
+```{r fig.asp=1}
+{
+par(pty="s")
+curve(x^2 - 2, -3, 3, col = "blue", asp = 1, ylab = "", lwd = 2,
+      main = expression(paste("Curve shifting ", x^{2})))
+curve(x^2, add = TRUE, col = "black", lwd = 2)
+curve((x + 1)^2 + 1, add = TRUE, col = "violet", lwd = 2)
+abline(h = 0, v = 0)
+abline(h = c(1, 2), v = -1, lty = "dashed")
+axis(side = 2, at = 1)
+axis(side = 1, at = -1)
+arrows(x0 = 0, y0 = 0, x1 = 0, y1 = -2, code = 2, length = 0.2, angle = 15, col = "blue", lwd = 3)
+arrows(x0 = 0, y0 = 0, x1 = -1, y1 = 0, code = 2, length = 0.2, angle = 15, col = "violet", lwd = 3)
+arrows(x0 = -1, y0 = 0, x1 = -1, y1 = 1, code = 2, length = 0.2, angle = 15, col = "violet", lwd = 3)
+legend("bottomright",
+       legend = c(
+          expression(x^{2}),
+          expression(x^{2} - 2),
+          expression((x + 1)^{2} + 1)
+        ),
+       lty = 1,
+       lwd = 2,
+       col = c("black", "blue", "violet")
+)
+}
+```
+
+See [12.2.1 Mathematical annotation](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Mathematical-annotation)
+
+From this example we see that
+
+- Plots can be added to the existing plot with the `add` option (only available in some high-level plotting commands. e.g. `?barplot`, `?stripchart`, `?curve`)
+- Low-level commands can modify elements in the existing plot
+
+
+### Low-level commands
+
+We've seen in the previous example how extra information can be added to plots created by high-level commands. We give another example:
+
+```{r fig.asp = 1}
+{
+xs <- seq(0, 1, by = 0.01)
+ys <- sqrt(1 - xs^2)
+
+set.seed(1)
+xp <- runif(n)
+yp <- runif(n)
+
+ic <- xp^2 + yp^2 < 1
+
+n <- 1000
+par(pty="s")
+plot(0:1, 0:1, type = "n", asp = 1, xaxs = "i", yaxs = "i",
+     xlab = "", ylab = "")
+lines(x = xs, y = ys)
+# curve(sqrt(1 - x^2), 0, 1, add = TRUE)
+#curve(-sqrt(1 - x^2), -1, 1, add = TRUE)
+polygon(c(xs, 1, 0), c(ys, 0, 0), col = "lightblue")
+points(xp[ic], yp[ic], col = "blue", pch = 19)
+points(xp[!ic], yp[!ic], col = "black", pch = 1)
+text(0.4, 0.4, expression(pi/4), cex = 4, bg = "red")
+title(main = "Monte Carlo integration", sub = expression(paste("estimating ", pi)))
+
+}
+```
+
+- `points`, add scattered points
+- `lines`, add lines
+- `text`, annotate graph with text
+- `abline`, add straight line, shorthand for horizontal or vertical
+- `polygon`, add a shaded area
+- `arrows`, add arrow
+- `legend`, add legend
+- `title(main =, sub =)`, add title to plot
+- `axis`, edit axis
+
+## `stats` graphics
+
+The commands  we demonstrated so far are from the `graphics` package which is part of base R. Another key package in base R is the `stats` package, which also includes some plotting commands. Take a look at `ls("package:stats")` for more. We give a short example
+
+```{r}
+scatter.smooth(x = cars$speed, y = cars$dist)
+```
+
+
+## Graphical Parameters
+
+Many of the graph settings are set via the `par` command. For a full list, refer to `?par`. We give a lookup table for two most frequently used parameters.
+
+### Point shapes `pch`
+
+[pch in R: How to Use Plot Character in R, R-Lang](https://r-lang.com/pch-in-r/)
+
+```{r eval = TRUE}
+ggpubr::show_point_shapes()
+```
+
+### Line Type `lty`
+
+```{r eval = TRUE}
+ggpubr::show_line_types()
+```
+
+## Exercises {-}
+
+See @sec-exercises-5 for exercises on plotting with Base R functions.
+
+
+

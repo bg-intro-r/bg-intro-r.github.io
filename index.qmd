@@ -1,0 +1,28 @@
+---
+reference-location: margin
+---
+
+# Preface {.unnumbered}
+
+This book is a collection of lecture notes prepared for the Introduction to R for Modellers module which takes place at the beginning of the [MSc Modelling for Global Health](https://www.ox.ac.uk/admissions/graduate/courses/msc-modelling-for-global-health) (MGH) course. The course makes no assumption on its students' computer coding experiences, so this book is suitable for readers with minimum knowledge of the R language and to coding in general.
+
+<!-- {{< glossary SESOI >}}
+
+{{< glossary runif >}}
+
+{{< glossary table=true >}} -->
+
+The MGH course has been running annually since autumn 2021, and so has the module. With each iteration of the course, we updated the module's content to match the abilities of our students and also to incorporate new developments on the R platform. New contents have been added to this book over the years as a result. Some contents are also now omitted from the module due to time constraints. The module now covers most but not all materials written in this book.
+
+**Incoming cohorts of the MGH course are highly encouraged to read this book before enrolment.**
+
+Materials from this book has also been used in training programmes such as the [Strategic Modelling for Public Health Policy Training Programme](https://como-international.github.io/training/training.html) organised by CoMo.
+
+> I would like to thank all that took part in the past teaching sessions of this module for their feedback. - Dr. Bo Gao
+
+
+
+
+
+
+

@@ -1,0 +1,119 @@
+# Operators 
+
+There are many operators in R. Type `?Syntax` and then press the `ENTER` key on your keyboard will take you to the documentation on "Operator Syntax and Precedence". In this session, we introduce three groups of commonly used operators in R.
+
+
+## Arithmetic operators
+
+Just like a calculator, R understands basic arithmetic operators.
+Try these following commands and see if the printed value is what you are expecting:
+
+```{r eval = FALSE}
+1 + 2         # addition
+25 - 17       # subtraction
+3 * 2.3       # multiplication
+13 / 7        # division
+10 + 20 * 2   # is equivalent to 10 + (20 * 2)
+(10 + 20) * 2 # use "( )" to control operator precedence
+2 ^ 3         # exponentiation
+2 ** 3        # exponentiation
+15 %% 10      # modulus
+15 %/% 10     # integer division
+```
+
+Want to know more about these operators? Type `?Arithmetic` in your REPL
+
+## Relational operators
+
+Relational operators compares values on its left and right.
+
+```{r eval = FALSE}
+6 > 5
+10 + 1 > 10         # + evaluated before >
+234 * 76 > 938 * 43 # * evaluated before >
+5 <= 5
+5 <= 4
+12 == 12
+12 != 12
+1 == TRUE  # 1 is the numerical presentation of TRUE
+2 == TRUE
+0 == FALSE # 0 is the numerical presentation of FALSE
+2 == FALSE
+2 != FALSE
+```
+
+<span class="quote-emph">Use `==` only when comparing integers.</span> We will revisit this issue when we introduce how real numbers are represented in the computer memory.
+
+## Logical operators
+
+Truth table for R's element-wise logical operators:
+
+| `x` | `y` | `x & y` | `x | y` | `xor(x, y)` |
+| --- | --- | ------- | --------- | ------------ |
+| `TRUE` | `TRUE` | `TRUE` | `TRUE` | `FALSE` |
+| `TRUE` | `FALSE` | `FALSE` | `TRUE` | `TRUE` |
+| `FALSE` | `TRUE` | `FALSE` | `TRUE` | `TRUE` |
+| `FALSE` | `FALSE` | `FALSE` | `FALSE` | `FALSE` |
+
+```{r eval = TRUE, results = "hold"}
+8 > 7 & 9 > 8           # TRUE and TRUE
+6 < 8 & 6 > 8           # TRUE and FALSE
+6 < 8 | 6 > 8           # TRUE or FALSE
+1 & TRUE                # TRUE and TRUE
+0 & TRUE                # FALSE and TRUE
+
+xor(TRUE, FALSE)        # exclusive or, TRUE if and only if the arguments differ
+xor(TRUE, TRUE)
+```
+
+### Difference between `&` and `&&`, and between `|` and `||`
+The `&` and `|` operators are vectorized, meaning they operate element-wise on vectors. The `&&` and `||` operators, on the other hand, are not vectorized and only evaluate the first element of each vector. This means that if you use `&&` or `||` with vectors, an error will be given. For example:
+```{r eval = FALSE}
+c(TRUE, FALSE) & c(FALSE, TRUE)   # this is okay, element-wise AND
+c(TRUE, FALSE) && c(FALSE, TRUE)  # error!
+```
+
+
+## Operator precedence
+
+In a mathematical equation, we know that multiplication and division take precedence over addition and subtraction. This precedence may be altered with the use of `()`.
+```{r eval = TRUE, results = "hold"}
+1 + 3 * 4 # 13
+(1 + 3) * 4 # 16
+```
+
+::: column-margin
+![[img source](https://grammar.yourdictionary.com/punctuation/how-to-use-brackets-in-grammar.html)](img/1_brackets.png)
+:::
+
+
+Operators in R are also governed by an order of precedence, which may be altered with the use of `()`. Type `?Syntax` will show you the precedence of all R operators many of which we have not introduced. It is important to note that <span class="quote-emph">**when mixing multiple operators in the same line of code, some operations takes precedence before others**</span>.
+
+Between the three groups of operators we introduced, `arithmetic operators` takes precedence over `relational operators` which takes precedence over `logical operators`.
+
+Try and work out the values of the following expressions without running them in R, and verify your results in R.
+
+```{r eval = FALSE}
+9 - 10 > 0 & 9 > 0      # Operator precedence (arithmetic > relational > logical)
+9 - (10 > 0 & 9 > 0)    # Alter operator precedence with brackets
+9 - (10 > 0) & 9 > 0    # Alter operator precedence with brackets
+TRUE | FALSE & FALSE    # & takes precedence before |
+(TRUE | FALSE ) & FALSE # Alter operator precedence with brackets
+```
+
+## Summary
+
+Quick reference for the three operator families we have covered:
+
+| Type | Common symbols | Typical purpose |
+| --- | --- | --- |
+| Arithmetic | `+ - * / ^ %% %/%` | Perform numeric calculations; highest precedence of the three. |
+| Relational | `> < >= <= == !=` | Compare two values and return `TRUE` or `FALSE`. |
+| Logical | `! & && | || xor()` | Combine logical (`TRUE`, `FALSE`) results; use `&`/`|` for element-wise checks in vectors and `&&`/`||` for single values; lowest precedence of the three. |
+
+
+
+
+Type `?Syntax` for more detailed documentation on operators in R.
+
+These operators are also referred to as **binary operators** for they take two objects (`x` and `y`) as inputs to produce one output object. `x` and `y` are also referred to as **operands** of the operation. `+` and `-` are **unary** operators when used to indicate the sign of numeric values.

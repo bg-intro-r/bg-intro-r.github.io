@@ -1,0 +1,74 @@
+# Exercises {-}
+
+## Exercises 1 {#sec-exercises-1}
+
+### E1.1 `IsMonth` {-}
+
+
+Write a function `IsMonth` which takes a single numerical value as input and returns TRUE iff that value may represent a month of the year.
+
+```{r eval = FALSE}
+IsMonth <- function (x) {
+    # your code goes here
+}
+# Check if your implementation is correct with the followings
+IsMonth(12.9) # FALSE
+IsMonth(12)   # TRUE
+IsMonth(1)    # TRUE
+IsMonth(-10)  # FALSE
+```
+
+
+### E1.2 `IsLeapYear` {-}
+
+Write a function `IsLeapYear` which takes a single numerical value as input and returns TRUE iff that value may represent a leap year. A leap year occurs on any year evenly divisible by 4, but not on a century unless it is divisible by 400.
+
+```{r eval = FALSE}
+IsLeapYear <- function (x) {
+    # your code goes here
+}
+# Check if your implementation is correct with the followings
+IsLeapYear(2000) # TRUE
+IsLeapYear(1900) # FALSE
+```
+
+
+### E1.3 `Bmi` {-}
+Write a function `Bmi` which calculates the Body Mass Index (BMI) given weight (in kilograms) and height (in meters) as inputs.
+
+$$bmi =\frac{weight}{height^2}$$
+
+```{r eval = FALSE}
+Bmi <- function(weight, height) {
+  # your code goes here
+}
+# Check if your implementation is correct with the followings
+Bmi(weight = 90, height = 1.75) # 29.38776
+```
+
+### E1.4 `FeetToMeters` {-}
+Write a function `FeetToMeters` which converts a numeric value in feet to meters. Given
+$$1 ~ feet = 0.3048 ~ meters$$
+
+```{r eval = FALSE}
+FeetToMeters <- function(ft) {
+  # your code goes here
+}
+# if your code is correct, this expression should evaluate to TRUE
+all.equal(FeetToMeters(10), 3.048) 
+```
+
+### E1.5 `SqFeetToSqMeters` {-}
+Use your implementation of `FeetToMeters` to convert a numeric value from square feet to square meters.
+
+```{r eval = FALSE}
+SqFeetToSqMeters <- function(sq_ft) {
+  # your code goes here
+}
+# if your code is correct, this expression should evaluate to TRUE
+all.equal(SqFeetToSqMeters(100), 9.290304)
+```
+
+
+
+

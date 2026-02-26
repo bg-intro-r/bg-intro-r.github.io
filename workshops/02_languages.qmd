@@ -1,0 +1,35 @@
+---
+author: "Bo Gao"
+date: "01-Sep-2021"
+---
+
+# Compiled vs Interpreted programming languages
+
+Computer programming is a means for the user to communicate with their computers. Just like different human languages are spoken in different parts of the world, different programming languages are used in different spectrum of computer applications. Despite their differences, all programming languages share the same "endgame" which is to **translate** instructions written by the user to machine codes that can be executed by a computer. There are, in general, two types of approaches in how this translation is done, namely **compiled** and **interpreted**.
+
+A programmer writes some code, save it in a file (same as you would do with a Word document or an Excel spreadsheet), but how does the computer know what to do with it? The computer understand only machine codes. What you need now is a translator to translate the code you wrote to machine codes. If your code is written in C++, then you will need to use a compiler such as [GCC](https://gcc.gnu.org/) to compile your code into a binary which can then be run on the computer. Whereas codes written in R are executed by an interpreter without the need for compilation.
+
+R is a good example of an interpreted programming language [[What is R?](https://cran.r-project.org/doc/FAQ/R-FAQ.html#:~:text=The%20core%20of%20R%20is%20an%20interpreted%20computer%20language)]. As an implementation of the S programming language the aim of which is "to turn ideas into software, quickly and faithfully", R codes are interpreted which gives it higher interactivity and cross-platform portability. This flexibility is at the cost of performance as compared to compiled languages such as C++, especially when the complexity of the code is high.
+
+Say you have a scientific question which you can not answer, there are two ways you can find the answer:
+
+ - A. Go to university and become a scientist yourself, and then find the answer as a scientist
+ - B. Ask a scientist to answer the question for you
+
+The workflow of a compiled programming language is similar to that of approach A. The compiler transforms the program script to a piece of binary (machine code) to the computer on which the compilation happened, the user can then execute this binary natively on the computer to get the result.
+
+An interpreted language on the other hand has an interpreter which can translate your script to machine code on the fly without the need to compile your code. This approach means the programming environment is more interactive and portable cross-platform. Think of the illustrated metaphor, if the question changes field, approach A means you need to train yourself to become a scientist of a new field, whereas in approach B, you can simply find another scientist for that field.
+
+This increased interactivity and portability is a key feature to modern programming languages such as Matlab, Python, and R. And the interactivity often comes in the form of a REPL.
+
+::: {.panel-tabset}
+
+## Illustration A {-}
+
+![Illustration: Difference between Interpreted and Compiled programming languages](img/1_language_1.png)
+
+## Illustration B {-}
+
+![Illustration: Difference between Interpreted and Compiled programming languages](img/1_language_2.png)
+
+:::

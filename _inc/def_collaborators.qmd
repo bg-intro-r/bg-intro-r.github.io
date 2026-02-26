@@ -1,0 +1,6 @@
+::: {.callout-tip collapse="true"}
+## Who are your collaborators?
+1. **Yourself**. Yes, you are collaborating with yourself, the future you. That you in a couple of days/weeks/months' time. You are handing over the development of this project to the future you. Will that you be able to understand everything that you are writing now? How easy will it be for you to pick this project up in the future? Will that future you hate the now you?
+2. **Your assignment and dissertation marker**. They are very judgemental, and they expect your code to work without modification.
+3. Others working on the same project.
+:::

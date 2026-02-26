@@ -1,0 +1,22 @@
+# Coding Style
+
+A good coding style is essential for ensuring the correctness of the program, and its maintainability. It is one of the elements included in the assessment of the technical work attached to essays and the dissertation on the MGH course.
+
+We recommend that you read follow two style guides:
+
+- Tidyverse style guide
+<https://style.tidyverse.org/>
+- Google's R Style Guide
+<https://google.github.io/styleguide/Rguide.html>
+
+You will see that Google's guide is essentially a note on top of the Tidyverse guide. We agree with Google when there is a conflict between the two guides.
+
+One place that our advice differ from Google's guide is the convention for naming functions. We use the `func_name_of_my_function` format when naming our R functions. i.e. a function's name should always begin with `func_` as a prefix, and the whole name is in `small_snake_case`.
+
+The file that contains the definition of the function should have identical name as the function. i.e. definition of a function named `func_abc` should be given in a file named `func_abc.R`.
+
+**Case styles**
+
+- `camelCase`, `lowerCamelCase`
+- `BigCamelCase`, `PascalCase`
+- `snake_case`

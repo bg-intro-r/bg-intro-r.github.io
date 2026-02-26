@@ -1,0 +1,32 @@
+color:
+  palette: 
+    white: "#FFFFFF"
+    ox-charcol: "#211D1C"
+    ox-blue: "#002147"
+    ox-green: "#426A5A"
+    ox-royal-blue: "#1D42A6"
+  foreground: ox-charcol
+  background: white
+  primary: ox-blue
+  secondary: ox-green
+typography:
+  fonts:
+    - family: Noto Serif
+      source: google
+      weight: 300
+    - family: Roboto
+      source: google
+    - family: Roboto Slab
+      source: google
+      weight: 300
+    - family: Fira Code
+      source: google
+  # base: Roboto Slab
+  # headings: Roboto
+  monospace:
+    # family: Fira Code
+    color: ox-royal-blue
+  link:
+    color: ox-blue
+    weight: 300
+    decoration: dotted

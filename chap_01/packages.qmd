@@ -1,0 +1,54 @@
+# Packages
+
+When it comes to sharing your code with others, you may:
+
+- Share an `.R` script
+- Share an `.RData` image
+- Build and share a package
+- Packages we used already: `dplyr`, `tidyr`, `lubridate`, `foreign`
+
+> A package bundles together code, data, documentation, and tests, and is easy to share with others. As of June 2019, there were over 14,000 packages available on the **C**omprehensive **R** **A**rchive **N**etwork, or **CRAN**, the public clearing house for R packages. This huge variety of packages is one of the reasons that R is so successful: the chances are that someone has already solved a problem that you’re working on, and you can benefit from their work by downloading their package. - [Chapter 1 Introduction, R Packages](https://r-pkgs.org/intro.html)
+
+```{r eval = FALSE}
+sessionInfo()
+```
+
+[SO: In R, what does "loaded via a namespace (and not attached)" mean?](https://stackoverflow.com/questions/14988722/in-r-what-does-loaded-via-a-namespace-and-not-attached-mean)
+
+
+- CRAN - R
+  - CPAN - Perl
+  - PyPI, Conda - Python
+  - npm - JavaScript
+  - As of Sep. 2021:
+    - there are over 18,000 packages indexed on [MetaCRAN](https://www.r-pkg.org/).
+    - `ggplot2` is the [most downloaded](https://www.r-pkg.org/downloaded) package
+    - `knir` is the [most depended upon](https://www.r-pkg.org/depended) package
+- Many more packages are available on Github
+  
+---
+
+- [Tidyverse](https://www.tidyverse.org/) is a collection of R packages
+  - `tibble`, tidyverse's data frame
+  - **`ggplot2`**, graphics
+  - `dplyr`, data manipulation
+  - `tidyr`, data tidying
+  - ...
+  - similar to `pandas` for Python
+
+
+- To see where your packages are saved on the computer: `.libPaths()`
+- To list all packages available on the computers: `lapply(.libPaths(), dir)`
+- With package `x`:
+  - `install.packages("x")` to install from CRAN 
+  - `library("x")` to use the package
+  - `package?x` to get help 
+    - `package?graphics`
+    - `package?ggplot2`
+  - Use [cheat sheets](https://www.rstudio.com/resources/cheatsheets/)
+- To create a package `?devtools::create`
+
+
+- A package has its own environment (see Fundamentals II)
+  - `ls("package:x")` lists all objects in that package
+  - e.g. `ls("package:graphics")`
