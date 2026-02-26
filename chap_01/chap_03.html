@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Bo Gao">
+<meta name="dcterms.date" content="2026-02-06">
+
+<title>8&nbsp; Data Structures – Introduction to R for Modellers</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../chap_02/containers_01.html" rel="next">
+<link href="../chap_01/code_style.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-597958c53c93a607afca12fd375c57ed.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-7ac2f9da8c2617a4fdd15004b4601015.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-597958c53c93a607afca12fd375c57ed.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-f20fda0d586aae35f34e9d1db767c6bf.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-0df3fcf739b8a8f11d64fcee4b5f352d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-f20fda0d586aae35f34e9d1db767c6bf.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chap_01/chap_03.html">Data Containers</a></li><li class="breadcrumb-item"><a href="../chap_01/chap_03.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Data Structures</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Introduction to R for Modellers</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../mgh.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MGH module matters</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Fundamentals</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/get_started.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Get Started</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/operators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Operators</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/function.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Function</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/chap_01_exercises_1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercises</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/control_flow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Control Flows</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/chap_01_exercises_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><strong>Exercises</strong></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/environments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Environments</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/chap_06_packages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Packages</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/code_style.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Coding Style</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Data Containers</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/chap_03.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Data Structures</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_02/containers_01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Homogeneous Types</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_02/containers_02.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Heterogeneous Types</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/chap_04.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Data Manipulation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/chap_05.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Data Visualisation I</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/chap_06.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Data Visualisation II</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_02/work_w_files.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Working with files</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Model Building</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/chap_07.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Statistical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/chap_08.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Mathematical Models</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_01/chap_09.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Performance</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Worksheets</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workshops/wks_02_rnumbers.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Random Numbers and Probability Distributions</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workshops/01_r_project.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Structuring an R project</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workshops/02_languages.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Compiled vs Interpreted programming languages</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workshops/wks_01.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Sensitivity analysis workflow</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workshops/eg_quarto_layout.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">A Quarto Page Layout Example</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../summary_functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Key functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_00/hardware.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Hardware</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chap_00/file_address_sys.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">B</span>&nbsp; <span class="chapter-title">File address system</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../workshops/00_know_your_computer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Know your computer</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="99">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#review" id="toc-review" class="nav-link active" data-scroll-target="#review">Review</a></li>
+  <li><a href="#data-structures" id="toc-data-structures" class="nav-link" data-scroll-target="#data-structures"><strong>Data structures</strong></a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">9</span> Summary</a></li>
+  <li><a href="#fundamentals-revisited" id="toc-fundamentals-revisited" class="nav-link" data-scroll-target="#fundamentals-revisited"><span class="header-section-number">10</span> Fundamentals revisited</a>
+  <ul class="collapse">
+  <li><a href="#vector-arithmetic" id="toc-vector-arithmetic" class="nav-link" data-scroll-target="#vector-arithmetic"><span class="header-section-number">10.1</span> Vector arithmetic</a></li>
+  <li><a href="#vectorize" id="toc-vectorize" class="nav-link" data-scroll-target="#vectorize"><span class="header-section-number">10.2</span> <code>Vectorize</code></a></li>
+  <li><a href="#functional-programming" id="toc-functional-programming" class="nav-link" data-scroll-target="#functional-programming"><span class="header-section-number">10.3</span> Functional programming</a>
+  <ul class="collapse">
+  <li><a href="#the-apply-family" id="toc-the-apply-family" class="nav-link" data-scroll-target="#the-apply-family"><span class="header-section-number">10.3.1</span> The <code>apply</code> family</a></li>
+  </ul></li>
+  <li><a href="#arithmetic-precision" id="toc-arithmetic-precision" class="nav-link" data-scroll-target="#arithmetic-precision"><span class="header-section-number">10.4</span> Arithmetic precision</a></li>
+  </ul></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><strong>Exercises</strong></a>
+  <ul class="collapse">
+  <li><a href="#e3.1-bmi2" id="toc-e3.1-bmi2" class="nav-link" data-scroll-target="#e3.1-bmi2">E3.1 <code>Bmi2</code></a></li>
+  <li><a href="#e3.2" id="toc-e3.2" class="nav-link" data-scroll-target="#e3.2">E3.2 <code>||</code>, <code>|</code>, <code>&amp;&amp;</code>, <code>&amp;</code></a></li>
+  <li><a href="#e3.3-table" id="toc-e3.3-table" class="nav-link" data-scroll-target="#e3.3-table">E3.3 <code>table</code></a></li>
+  <li><a href="#e3.4-apply" id="toc-e3.4-apply" class="nav-link" data-scroll-target="#e3.4-apply">E3.4 <code>apply</code></a></li>
+  </ul></li>
+  <li><a href="#further-topics" id="toc-further-topics" class="nav-link" data-scroll-target="#further-topics"><strong>Further Topics</strong></a></li>
+  <li><a href="#scalar-and-vectors" id="toc-scalar-and-vectors" class="nav-link" data-scroll-target="#scalar-and-vectors"><span class="header-section-number">11</span> Scalar and vectors</a></li>
+  <li><a href="#statement-terminator" id="toc-statement-terminator" class="nav-link" data-scroll-target="#statement-terminator"><span class="header-section-number">12</span> Statement terminator</a></li>
+  <li><a href="#null-in-computers" id="toc-null-in-computers" class="nav-link" data-scroll-target="#null-in-computers"><span class="header-section-number">13</span> null in computers</a></li>
+  <li><a href="#typing-systems" id="toc-typing-systems" class="nav-link" data-scroll-target="#typing-systems"><span class="header-section-number">14</span> Typing systems</a></li>
+  <li><a href="#sexp" id="toc-sexp" class="nav-link" data-scroll-target="#sexp"><span class="header-section-number">15</span> SEXP</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"><span class="header-section-number">16</span> 0.300…004</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/bg-intro-r/bg-intro-r.github.io" class="toc-action"><i class="bi bi-chat-right"></i>Report an issue</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chap_01/chap_03.html">Data Containers</a></li><li class="breadcrumb-item"><a href="../chap_01/chap_03.html"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Data Structures</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Data Structures</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Bo Gao </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 6, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="review" class="level1 unnumbered">
+<h1 class="unnumbered">Review</h1>
+<ul>
+<li>Control flow
+<ul>
+<li>Choices - <code>if</code>, <code>else</code></li>
+<li>Loops - <code>:</code>, <code>for</code>, <code>next</code>, <code>break</code>, <code>while</code></li>
+<li>Exception handling - <code>stop</code>, <code>warning</code>, <code>message</code></li>
+</ul></li>
+<li>Functions
+<ul>
+<li>Default values, <code>...</code></li>
+<li>Scoping</li>
+<li>Lazy evaluation</li>
+</ul></li>
+<li>Environments
+<ul>
+<li><code>environment</code>, <code>.GlobalEnv</code>, <code>globalenv()</code></li>
+<li><code>new.env</code>, <code>assign</code>, <code>ls</code>, <code>rm</code></li>
+<li><code>with</code></li>
+</ul></li>
+</ul>
+</section>
+<section id="data-structures" class="level1 unnumbered">
+<h1 class="unnumbered"><strong>Data structures</strong></h1>
+<p>If you have experiences in programming languages such as C, C++, or Java, you are probably wondering why we have not said anything about primitive types such as <code>int</code>, <code>float</code>, and <code>boolean</code> yet? And how are we going to introduce data structures, such as vectors, without defining scalar types first?</p>
+<ul>
+<li>First of all, as you might have noticed, R is dynamically-typed (see <a href="#typing-systems">Typing systems</a>), which is why we are able to use R as a calculator without specifying the types of the values we give to R in our code.</li>
+<li>More importantly, and dramatically, as we will show in this session, <strong>all primitive types in R are vectors</strong>.</li>
+</ul>
+<p>See <a href="#scalar-and-vectors">Scalar and vectors</a> if you are not sure of these terms.</p>
+<p><strong>Outline</strong></p>
+<ul>
+<li>Vectors</li>
+<li>Attributes</li>
+<li>Lists</li>
+<li>Functional programming</li>
+</ul>
+<p><strong>Recommended readings:</strong></p>
+<ul>
+<li><a href="https://adv-r.hadley.nz/vectors-chap.html">Chapter 3, Advanced R, Hadley</a></li>
+<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-ints.html">R Internals</a></li>
+<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-lang.html">R Language Definition</a></li>
+<li><a href="https://adv-r.hadley.nz/functionals.html">Chapter 9, Functionals, Hadley</a></li>
+</ul>
+</section>
+<section id="summary" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Summary</h1>
+<ul>
+<li>atomic vectors are the primitive types in R</li>
+<li>data of different types may be coerced into another type</li>
+<li>attributes add context to atomic vectors</li>
+<li>matrices are atomic vectors with <code>dim</code> attribute</li>
+<li>class is attribute of atomic vectors</li>
+<li>all values in vectors are of the same type</li>
+<li>lists are collections of vectors of varying type and length</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/4_data_structures.png" class="img-fluid figure-img"></p>
+<figcaption>Diagram: data structures in R</figcaption>
+</figure>
+</div>
+</section>
+<section id="fundamentals-revisited" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Fundamentals revisited</h1>
+<p>In the previous two sessions (Fundamentals I &amp; II), we were</p>
+<ul>
+<li>Using numbers as if they were scalars</li>
+<li>Looping over values as if they were separate entities</li>
+</ul>
+<p>Having learnt new things about R from this session, knowing that data structures of R are built on vectors, what do you think is the implication of this design?</p>
+<section id="vector-arithmetic" class="level2" data-number="10.1">
+<h2 data-number="10.1" class="anchored" data-anchor-id="vector-arithmetic"><span class="header-section-number">10.1</span> Vector arithmetic</h2>
+<p>Now you know that <code>1</code> is actually a vector of length 1 the first and only element of which is the value <code>1</code>, what does the expression <code>1 + 2</code> mean? Yes, you added two vectors (both of length 1) together. Therefore, all the operators in R operate assume input as vectors and gives vectors as outputs:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>a <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">7</span>, <span class="dv">9</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>b <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>)</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a>a <span class="sc">+</span> b</span>
+<span id="cb1-5"><a href="#cb1-5"></a>a <span class="sc">*</span> b</span>
+<span id="cb1-6"><a href="#cb1-6"></a>b <span class="sc">%%</span> a</span>
+<span id="cb1-7"><a href="#cb1-7"></a>a <span class="sc">&lt;</span> b</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>And our <code>Bmi</code> function works with vectors too.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>Bmi <span class="ot">&lt;-</span> <span class="cf">function</span>(weight, height) {</span>
+<span id="cb2-2"><a href="#cb2-2"></a>  <span class="fu">return</span>(weight <span class="sc">/</span> height<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a>}</span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="fu">Bmi</span>(<span class="fu">c</span>(<span class="dv">60</span><span class="sc">:</span><span class="dv">70</span>), <span class="fu">seq</span>(<span class="fl">1.7</span>, <span class="fl">1.9</span>, <span class="at">length.out =</span> <span class="dv">11</span> ))</span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="fu">Bmi</span>(<span class="dv">60</span><span class="sc">:</span><span class="dv">70</span>, <span class="fl">1.7</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Meaning that when you have a list of inputs, you don’t need a for loop calling <code>Bmi</code> iteratively to get a list of outputs.</p>
+<p>Note the difference between the longer and shorter forms of <code>&amp;</code> and <code>|</code></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>) <span class="sc">&amp;</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">TRUE</span>) <span class="sc">&amp;&amp;</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>) <span class="sc">|</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">FALSE</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>) <span class="sc">||</span> <span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="vectorize" class="level2" data-number="10.2">
+<h2 data-number="10.2" class="anchored" data-anchor-id="vectorize"><span class="header-section-number">10.2</span> <code>Vectorize</code></h2>
+<ul>
+<li>Some functions do not account for vector input.</li>
+<li><code>Vectorize</code> creates a function wrapper that vectorizes the action of its argument function.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># We want to generate 15 random numbers from 3 poisson distributions</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="fu">rpois</span>(<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">70</span>, <span class="dv">700</span>)) <span class="co"># rpois is not vectorised</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a>Vrpois <span class="ot">&lt;-</span> <span class="fu">Vectorize</span>(rpois, <span class="fu">c</span>(<span class="st">"n"</span>, <span class="st">"lambda"</span>))</span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="fu">Vrpois</span>(<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">70</span>, <span class="dv">700</span>))</span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co"># same as mapply(rpois, 5, c(7, 70, 700))</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="functional-programming" class="level2" data-number="10.3">
+<h2 data-number="10.3" class="anchored" data-anchor-id="functional-programming"><span class="header-section-number">10.3</span> Functional programming</h2>
+<p>Functions are first class objects in R:</p>
+<ul>
+<li>Functions are printed just like a variable is</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>a <span class="co"># value of a printed</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="fu">return</span>(<span class="fu">sum</span>(x <span class="sc">+</span> y))</span>
+<span id="cb5-6"><a href="#cb5-6"></a>}</span>
+<span id="cb5-7"><a href="#cb5-7"></a>f <span class="co"># implementation of f printed</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<ul>
+<li>Functions can be passed on to another function like a variable:</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>f <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y, func) {</span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">return</span>(<span class="fu">func</span>(x <span class="sc">+</span> y))</span>
+<span id="cb6-3"><a href="#cb6-3"></a>}</span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="fu">f</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>, sum)</span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="fu">f</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>, mean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="the-apply-family" class="level3" data-number="10.3.1">
+<h3 data-number="10.3.1" class="anchored" data-anchor-id="the-apply-family"><span class="header-section-number">10.3.1</span> The <code>apply</code> family</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>m <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, <span class="at">nrow =</span> <span class="dv">4</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>m</span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="fu">apply</span>(m, <span class="at">MARGIN =</span> <span class="dv">1</span>, max)</span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="fu">apply</span>(m, <span class="at">MARGIN =</span> <span class="dv">2</span>, max)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<ul>
+<li><code>apply</code> - Like its name suggests, <code>apply</code> applies a given function over a data structure, more specifically according to <code>?apply</code>: it applies functions over array margins.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/3_margin.png" class="img-fluid figure-img"></p>
+<figcaption><a href="http://meloukhia.net/2014/06/book_review_s_by_doug_dorst_and_jj_abrams/">image source</a></figcaption>
+</figure>
+</div>
+<ul>
+<li><code>lapply</code> loops the top level dimension and returns a list</li>
+<li><code>sapply</code> simplifies the returned list from <code>lapply</code> if all elements in that list is of the same length</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, sqrt)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>l <span class="ot">&lt;-</span> <span class="fu">list</span>( <span class="at">e1 =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">e2 =</span> <span class="dv">11</span><span class="sc">:</span><span class="dv">15</span>, <span class="at">e3 =</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>))</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="fu">lapply</span>(l, <span class="at">FUN =</span> max)</span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="fu">unlist</span>(<span class="fu">lapply</span>(l, <span class="at">FUN =</span> max))</span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="fu">sapply</span>(l, <span class="at">FUN =</span> max)</span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="fu">identical</span>(<span class="fu">unlist</span>(<span class="fu">lapply</span>(l, <span class="at">FUN =</span> max)), <span class="fu">sapply</span>(l, <span class="at">FUN =</span> max))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<ul>
+<li><code>mapply</code> is a multivariate version of <code>sapply</code>. <code>mapply</code> applies the function to the first elements of each argument, the second elements, the third elements, and so on. Arguments are recycled if necessary.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># We want to generate 15 random numbers from 3 poisson distributions</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="fu">rpois</span>(<span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">70</span>, <span class="dv">700</span>)) <span class="co"># rpois is not vectorised</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="fu">mapply</span>(rpois, <span class="dv">5</span>, <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">70</span>, <span class="dv">700</span>))   <span class="co"># matrix is returned if possible</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="fu">mapply</span>(rpois, <span class="dv">5</span><span class="sc">:</span><span class="dv">7</span>, <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">70</span>, <span class="dv">700</span>)) <span class="co"># otherwise a list is returned</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Outer product of two vectors <span class="math inline">\(v_1\otimes v_2\)</span> is very useful to vectorise functions that require two inputs:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>v1 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>v2 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="fu">outer</span>(v1, v2, <span class="at">FUN =</span> <span class="cf">function</span>(x, y){x <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>y} )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="arithmetic-precision" class="level2" data-number="10.4">
+<h2 data-number="10.4" class="anchored" data-anchor-id="arithmetic-precision"><span class="header-section-number">10.4</span> Arithmetic precision</h2>
+<p><code>double</code> and <code>integer</code> are referred to as <strong>numeric</strong> types in R.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">is.numeric</span>(<span class="dv">123</span>L)</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="fu">is.numeric</span>(.<span class="dv">123</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Many experienced R users are able to write perfectly functioning R codes without knowing that there are two numeric types in R. R’s dynamic typing system (see <a href="#typing-systems">Typing systems</a>), and use of implicit conversion (see [Coercion]) make this possible. But knowing the difference between the two types and their implementation will help you diagnose your code when it is not working as intended. Take a look at the following example:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>(<span class="fl">0.1</span> <span class="sc">+</span> <span class="fl">0.2</span>) <span class="sc">==</span> <span class="fl">0.3</span> <span class="co"># what is the value of this expression? Is it what you are expecting?</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a>(.<span class="dv">1</span> <span class="sc">+</span> .<span class="dv">2</span>) <span class="sc">-</span> .<span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Recall when we introduced relational operators (<code>==</code>, <code>!=</code>,…), we emphasized that only use these operators for integer values. What if we convert the doubles to integers?</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>(<span class="fl">0.1</span> <span class="sc">+</span> <span class="fl">0.2</span>) <span class="sc">*</span> <span class="dv">10</span> <span class="sc">==</span> <span class="fl">0.3</span> <span class="sc">*</span> <span class="dv">10</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="fu">as.integer</span>((<span class="fl">0.1</span> <span class="sc">+</span> <span class="fl">0.2</span>) <span class="sc">*</span> <span class="dv">10</span>) <span class="sc">==</span> <span class="fu">as.integer</span>(<span class="fl">0.3</span> <span class="sc">*</span> <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>As stated in <a href="https://cran.r-project.org/doc/FAQ/R-FAQ.html#Why-doesn_0027t-R-think-these-numbers-are-equal_003f">Why doesn’t R think these numbers are equal?, R FAQ</a> :</p>
+<blockquote class="blockquote">
+<p><span class="quote-emph">The only numbers that can be represented <strong>exactly</strong> in R’s numeric type are integers and fractions whose denominator is a power of 2.</span></p>
+</blockquote>
+<blockquote class="blockquote">
+<p><code>?all.equal</code> - The function <code>all.equal()</code> compares two objects using a numeric tolerance of <code>.Machine$double.eps ^ 0.5</code>. If you want much greater accuracy than this you will need to consider error propagation carefully.</p>
+</blockquote>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">all.equal</span>((<span class="fl">0.1</span> <span class="sc">+</span> <span class="fl">0.2</span>), <span class="fl">0.3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The short answer to this question is <strong>precision</strong>. More precisely, the precision of the representation of fractions is limited in a computer.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">sprintf</span>(<span class="st">"%.30f"</span>, <span class="fl">0.1</span> <span class="sc">+</span> <span class="fl">0.2</span>) <span class="co"># sprintf is a wrapper for the identically named C function. see `?sprintf`</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="fu">sprintf</span>(<span class="st">"%.30f"</span>, <span class="fl">0.3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>You can also use this website <a href="https://www.binaryconvert.com/convert_double.html">Decimal to binary converter IEEE 754</a> to see the binary representation of double typed values.</p>
+<p>For the long answer, see <a href="#section">0.300…004</a>.</p>
+</section>
+</section>
+<section id="exercises" class="level1 unnumbered">
+<h1 class="unnumbered"><strong>Exercises</strong></h1>
+<section id="e3.1-bmi2" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="e3.1-bmi2">E3.1 <code>Bmi2</code></h2>
+<p>Add a return value <code>advice_text</code> to the <code>Bmi2</code> function we drafted in the lecture. The value of <code>advice_text</code> should be chosen from one of the four character strings below according to <code>bim_value</code>:</p>
+<ul>
+<li>“below 18.5 – you’re in the underweight range”</li>
+<li>“between 18.5 and 24.9 – you’re in the healthy weight range”</li>
+<li>“between 25 and 29.9 – you’re in the overweight range”</li>
+<li>“between 30 and 39.9 – you’re in the obese range”</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>Bmi2 <span class="ot">&lt;-</span> <span class="cf">function</span>(weight, height) {</span>
+<span id="cb16-2"><a href="#cb16-2"></a>  <span class="co"># your code</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a>}</span>
+<span id="cb16-4"><a href="#cb16-4"></a>bb <span class="ot">&lt;-</span> <span class="fu">Bmi2</span>(<span class="at">weight =</span> <span class="dv">90</span>, <span class="at">height =</span> <span class="fl">1.75</span>)</span>
+<span id="cb16-5"><a href="#cb16-5"></a>bb[[<span class="st">"value"</span>]]</span>
+<span id="cb16-6"><a href="#cb16-6"></a>bb[[<span class="st">"reduce_weight"</span>]]</span>
+<span id="cb16-7"><a href="#cb16-7"></a>bb[[<span class="st">"advice_text"</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="e3.2" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="e3.2">E3.2 <code>||</code>, <code>|</code>, <code>&amp;&amp;</code>, <code>&amp;</code></h2>
+<p>Execute the following code snippet and answer the two questions in the comment:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">rm</span>(u)</span>
+<span id="cb17-2"><a href="#cb17-2"></a>u <span class="co"># expect to see an error</span></span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="co"># Error: object 'u' not found</span></span>
+<span id="cb17-4"><a href="#cb17-4"></a></span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="co"># 1. Why do the next two expressions evaluate to different results and why?</span></span>
+<span id="cb17-6"><a href="#cb17-6"></a><span class="cn">TRUE</span> <span class="sc">||</span> u</span>
+<span id="cb17-7"><a href="#cb17-7"></a><span class="cn">TRUE</span> <span class="sc">|</span> u</span>
+<span id="cb17-8"><a href="#cb17-8"></a></span>
+<span id="cb17-9"><a href="#cb17-9"></a><span class="co"># 2. Why do the next two expressions evaluate to different results and why?</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a><span class="cn">FALSE</span> <span class="sc">&amp;&amp;</span> u</span>
+<span id="cb17-11"><a href="#cb17-11"></a><span class="cn">FALSE</span> <span class="sc">&amp;</span> u</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="e3.3-table" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="e3.3-table">E3.3 <code>table</code></h2>
+<p>Given <code>t &lt;- table(c("apple", "banana", "coconut", "apple", "apple", "banana"))</code> 1. What is the base type of <code>t</code>? 2. What attributes are associated with <code>t</code>? 3. What do you know about each of <code>t</code>’s attributes? 4. Which attribute(s) does <code>t</code> share with a matrix?</p>
+</section>
+<section id="e3.4-apply" class="level2 unnumbered">
+<h2 class="unnumbered anchored" data-anchor-id="e3.4-apply">E3.4 <code>apply</code></h2>
+<p>The <code>runif</code> function generates a vector of <a href="https://en.wikipedia.org/wiki/Continuous_uniform_distribution">uniformly distributed</a> random numbers within a given interval. For example, <code>runif(10, min = 2, max = 3)</code> returns 10 random numbers between <code>2</code> and <code>3</code>.</p>
+<ol type="1">
+<li>With the help of this function, create a 1000 x 6 matrix of uniformly distributed values between <code>5</code> and <code>6</code>.</li>
+<li>Calculate the 6 column-wise averages of the 1000 x 6 matrix without using a for loop.</li>
+</ol>
+</section>
+</section>
+<section id="further-topics" class="level1 unnumbered">
+<h1 class="unnumbered"><strong>Further Topics</strong></h1>
+<p><a href="http://janvitek.org/pubs/ecoop12.pdf">Evaluating the Design of the R Language, Objects and Functions For Data Analysis</a></p>
+</section>
+<section id="scalar-and-vectors" class="level1" data-number="11">
+<h1 data-number="11"><span class="header-section-number">11</span> Scalar and vectors</h1>
+<p>(More details on this topic will be provided in the “Mathematics for Modellers” module taking place in week 2.)</p>
+<p>We illustrate the difference between scalars and vectors with this simple example in a 2-dimensional space:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/3_scalar_vector.png" class="img-fluid figure-img"></p>
+<figcaption><a href="https://en.wikipedia.org/wiki/Scalar_(mathematics)">image source</a></figcaption>
+</figure>
+</div>
+<p>In the x-y space (2-dimensional) illustrated above, when considered independently, x and y are two scalar values. When combined, (x, y) defines the direction of the vector v in respect to the origin (where the two axis intersect).</p>
+<p>And of course, you can imagine in a 3-dimensional space (an x-y-z space), a vector is defined as v = (x, y, z). The list of values inside the parentheses gets longer as the number of dimensions of the space gets higher.</p>
+<p>In some programming languages, vectors are referred to as arrays.</p>
+<blockquote class="blockquote">
+<p>Did you know that <strong>mosquitos</strong> are referred to as <strong>vectors</strong> in infectious disease modelling?</p>
+</blockquote>
+</section>
+<section id="statement-terminator" class="level1" data-number="12">
+<h1 data-number="12"><span class="header-section-number">12</span> Statement terminator</h1>
+<p>The code snippet below has three lines of code.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a>b <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="fu">print</span>(a <span class="sc">+</span> b)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>If we add <code>;</code> at the end of each statement, we can write all three statements in one line of code:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span>; b <span class="ot">&lt;-</span> <span class="dv">2</span>; <span class="fu">print</span>(a <span class="sc">+</span> b) <span class="co"># not good practice, don't do this</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>In programming languages, a syntax like <code>;</code> is referred to as a <strong>statement terminator</strong> (or delimiter). As the name suggests, it indicates the end of a statement. In languages such as C and Java, <code>;</code> is the only statement terminator, thus the use of <code>;</code> is mandatory. In R (and Python, Javascript, Matlab …), additional to semicolons, a new line <strong>may</strong> indicate the end of a statement, therefore <code>;</code> can be omitted in most cases.</p>
+<blockquote class="blockquote">
+<p><a href="https://cran.r-project.org/doc/manuals/r-devel/R-lang.html#Control-structures">3.2 Control structures, R Language Definition</a>: Both semicolons and new lines can be used to separate statements. A semicolon always indicates the end of a statement while a new line may indicate the end of a statement. If the current statement is not syntactically complete new lines are simply ignored by the evaluator. If the session is interactive the prompt changes from ‘&gt;’ to ‘+’.</p>
+</blockquote>
+<p>The difference between a new line and a semicolon is that it only “may” be the end of a statement. This is why we can split a long statement into multiple lines without getting an error:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>l <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb20-2"><a href="#cb20-2"></a>  <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>),</span>
+<span id="cb20-3"><a href="#cb20-3"></a>  <span class="fl">1.2</span>,</span>
+<span id="cb20-4"><a href="#cb20-4"></a>  <span class="st">"age"</span></span>
+<span id="cb20-5"><a href="#cb20-5"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This is good, but <span class="quote-emph">if you are used to program in a language in which a semicolon is mandatory, you need to be aware that a statement may end before you think it does</span>:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>a <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span> <span class="sc">+</span> <span class="dv">3</span> <span class="sc">+</span> <span class="dv">4</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a>   <span class="sc">+</span> <span class="dv">5</span> <span class="sc">+</span> <span class="dv">6</span> <span class="sc">+</span> <span class="dv">7</span> <span class="sc">+</span> <span class="dv">8</span>    <span class="co"># what is the value of a?</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/3_semicolon.png" class="img-fluid figure-img"></p>
+<figcaption>Have you found it yet?</figcaption>
+</figure>
+</div>
+</section>
+<section id="null-in-computers" class="level1" data-number="13">
+<h1 data-number="13"><span class="header-section-number">13</span> null in computers</h1>
+<p>Computer programs have the tendency to frame everything in binary forms: the power is either on or off, a key on the keyboard is either pressed or not, a website is either online or offline. With a sequence of binary switches, all real numbers can be represented by their corresponding binary form. Surely, there is nothing left to cover, right?</p>
+<p>Hold on, what about <strong>nothing</strong> ? What represents nothing?</p>
+<p>Programming languages often refer to this nothing-ness using the word “null”. Unix systems have the <code>dev/null</code> device for dumping outputs, SQL uses NULL to indicate values missing from a database, a null pointer indicates that the target is not a valid object in languages such as C++.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/3_null_pointer.png" class="img-fluid figure-img"></p>
+<figcaption>Illustration: Pointer and Null pointer</figcaption>
+</figure>
+</div>
+<p>In the case of null pointer, its definition requires the guarantee that a null pointer does not compare equal to any pointer that point to a valid object. This is an example of the next layer of issue caused by this nothing-ness:</p>
+<p>Mixing null value with other values often produces ambiguous results. This state is <strong>indeterminate</strong>, neither <code>TRUE</code> or <code>FALSE</code>. See <a href="https://en.wikipedia.org/wiki/Three-valued_logic">Three-valued logic</a></p>
+<p>In summary, to understand the use of <code>NA</code> and <code>NULL</code>, it is important to note the distinction between the two null-related issues computer programs have to deal with:</p>
+<ol type="1">
+<li>Missing or undefined values</li>
+<li>Indeterminate logic state</li>
+</ol>
+<p>More on this topic:</p>
+<ul>
+<li><a href="https://www.r-bloggers.com/2010/04/r-na-vs-null/">R : NA vs.&nbsp;NULL</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Three-valued_logic">Three-valued logic</a></li>
+<li><a href="https://faculty.nps.edu/sebuttre/home/R/missings.html">Missing Values in R</a></li>
+</ul>
+</section>
+<section id="typing-systems" class="level1" data-number="14">
+<h1 data-number="14"><span class="header-section-number">14</span> Typing systems</h1>
+<p><a href="https://en.wikipedia.org/wiki/Type_system">Wiki: Type system</a></p>
+<p><a href="https://stackoverflow.com/questions/1517582/what-is-the-difference-between-statically-typed-and-dynamically-typed-languages">SO: What is the difference between statically typed and dynamically typed languages?</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Strong_and_weak_typing#:~:text=Note%20that%20in%20dynamically%20typed%20languages%2C%20values%20have%20types%2C%20not%20variables.">Note that in dynamically typed languages, values have types, not variables.</a></p>
+</section>
+<section id="sexp" class="level1" data-number="15">
+<h1 data-number="15"><span class="header-section-number">15</span> SEXP</h1>
+<p>R is primarily written in C, Fortran, and R itself. (<a href="https://github.com/wch/r-source/">R source code</a>) The R software environment is a GNU package, and is freely available under the GNU General Public License. It is necessary to know something about how R objects are handled in C code. All the R objects you will deal with will be handled with the type <code>SEXP</code>, which is a pointer to a structure with typedef <code>SEXREC</code>.</p>
+<p><strong>Symbolic-expression (<code>SEXP</code>) record (<code>REC</code>)</strong> structure, is a C structure underlying every R object, accessible via a pointer of type <code>SEXP</code>.</p>
+<blockquote class="blockquote">
+<p><code>SEXP</code> is common in LISP-like language syntaxes it is a way to represent a nested list of data. For example, the simple mathematical expression “five times the sum of seven and three” can be written as a s-expression with prefix notation. In Lisp, the s-expression might look like <code>(* 5 (+ 7 3))</code>.</p>
+</blockquote>
+<p><code>SEXPREC</code> is a variant type that can handle all the usual types of R objects, that is vectors of various modes, function, environments, language objects, etc.</p>
+<p>The four atomic vector types correspond to four SEXP types:</p>
+<ul>
+<li><code>INTSXP</code> : integer vectors</li>
+<li><code>REALSXP</code> : double vectors</li>
+<li><code>CPLXSXP</code> : complex vectors</li>
+<li><code>STRSXP</code> : character vectors</li>
+</ul>
+<p><code>NULL</code> is defined with SEXPTYPE #0 <code>NILSXP</code></p>
+<p>To learn more on this topic:</p>
+<ul>
+<li><a href="https://cran.r-project.org/doc/manuals/r-release/R-ints.html#SEXPTYPEs">1.1.1 SEXPTYPEs, R Internals</a></li>
+<li><a href="https://www.computerhope.com/jargon/s/s-expression.htm">S-expression</a></li>
+<li><a href="https://youtu.be/xiqYaHa2x4s?t=1516">Rcpp: Seamless R and C++ Integration. Matt P. Dziubinski, CppCon 2015</a></li>
+<li><a href="https://rdrr.io/github/ramiromagno/c3po/f/README.md">ramiromagno/c3po: From C to R and back again</a></li>
+</ul>
+</section>
+<section id="section" class="level1" data-number="16">
+<h1 data-number="16"><span class="header-section-number">16</span> 0.300…004</h1>
+<p>So you want to know more about this:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>(<span class="fl">0.1</span> <span class="sc">+</span> <span class="fl">0.2</span>) <span class="sc">==</span> <span class="fl">0.3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<p>What is a floating point number and how is it different from an integer?</p>
+<ul>
+<li><a href="https://www.doc.ic.ac.uk/~eedwards/compsys/float/">Floating point numbers</a></li>
+<li><a href="https://www.youtube.com/watch?v=8afbTaA-gOQ">Decimal to IEEE 754 Floating Point Representation</a></li>
+<li><a href="https://www.youtube.com/watch?v=RuKkePyo9zk">IEEE 754 Standard for Floating Point Binary Arithmetic</a></li>
+<li><a href="https://www.binaryconvert.com/convert_double.html">Decimal to binary converter IEEE 754</a></li>
+</ul>
+<p>Precision issue with floating point numbers:</p>
+<ul>
+<li><a href="https://stackoverflow.com/questions/588004/is-floating-point-math-broken">Is floating point math broken?</a></li>
+<li><a href="https://0.30000000000000004.com/">Floating point math</a></li>
+<li><a href="https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html">What Every Computer Scientist Should Know About Floating-Point Arithmetic</a></li>
+<li><a href="https://www.r-bloggers.com/2015/06/r-in-a-64-bit-world/">R in a 64 bit world</a></li>
+</ul>
+<p>The only numbers that can be represented <strong>exactly</strong> in R’s numeric type are integers and fractions whose denominator is a power of 2. :</p>
+<ul>
+<li><a href="https://cran.r-project.org/doc/FAQ/R-FAQ.html#Why-doesn_0027t-R-think-these-numbers-are-equal_003f">Why doesn’t R think these numbers are equal?, R FAQ</a></li>
+<li><a href="http://link.springer.com/content/pdf/bbm%3A978-1-4939-2122-5%2F1.pdf">Appendix G “Computational Precision and Floating Point Arithmetic”, pages 753–771 of Statistical Analysis and Data Display: An Intermediate Course with Examples in R, Richard M. Heiberger and Burt Holland (Springer 2015, second edition)</a></li>
+</ul>
+<p>Relax … everything is working as intended :)</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/3_e_to_the_pi_minus_pi.png" class="img-fluid figure-img"></p>
+<figcaption>xkcd 217 <a href="https://www.explainxkcd.com/wiki/index.php/217:_e_to_the_pi_Minus_pi">explained</a></figcaption>
+</figure>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../chap_01/code_style.html" class="pagination-link" aria-label="Coding Style">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Coding Style</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../chap_02/containers_01.html" class="pagination-link" aria-label="Homogeneous Types">
+        <span class="nav-page-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Homogeneous Types</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Copyright 2021 - 2025, Bo Gao</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/bg-intro-r/bg-intro-r.github.io" class="toc-action"><i class="bi bi-chat-right"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/bogaotory">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/bogaowarwick/">
+      <i class="bi bi-linkedin" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
